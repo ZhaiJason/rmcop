@@ -1,4 +1,4 @@
-#' Title Present Value of A Bond
+#' Present Value of A Plain Vanilla Bond
 #'
 #' @description `pv` computes the present value of a plain vanilla bond given its future value and assumes a fixed interest rate.
 #'

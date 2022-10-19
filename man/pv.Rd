@@ -2,7 +2,7 @@
 % Please edit documentation in R/pv.R
 \name{pv}
 \alias{pv}
-\title{Title Present Value of A Bond}
+\title{Present Value of A Plain Vanilla Bond}
 \usage{
 pv(fv, r, m, n = 1)
 }
