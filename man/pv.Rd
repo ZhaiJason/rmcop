@@ -24,5 +24,5 @@ If \code{m} is specified as a number, the present value is computed via discrete
 \code{pv} computes the present value of a plain vanilla bond given its future value and assumes a fixed interest rate.
 }
 \examples{
-pv(fv = 105, r = 0.05, m = 1) # = 1
+pv(fv = 105, r = 0.05, m = 1) # = 100
 }
