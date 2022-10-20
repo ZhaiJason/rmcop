@@ -12,13 +12,13 @@
 #' @export
 #'
 #' @examples
-#' pv(fv = 105, r = 0.05, m = 1) # = 1
+#' pv(fv = 105, r = 0.05, m = 1) # = 100
 pv <- function(fv, r, m, n = 1) {
 
-    if(!is.numeric(fv)) stop("fv must be a number")
-    if(!is.numeric(r)) stop("r must be a number")
-    if(!is.numeric(m)) stop("m must be a number")
-    if(!is.numeric(n)) stop("n must be a number")
+    if (!is.numeric(fv)) stop("fv must be a number")
+    if (!is.numeric(r)) stop("r must be a number")
+    if (!is.numeric(m)) stop("m must be a number")
+    if (!is.numeric(n)) stop("n must be a number")
 
     fv * ifelse(missing(m), exp(-r * n), (1 + r / m)^(-n * m))
 
