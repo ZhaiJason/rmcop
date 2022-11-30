@@ -2,7 +2,7 @@
 % Please edit documentation in R/binomial.R
 \name{rnv.american}
 \alias{rnv.american}
-\title{Risk-neutral Valuation for American Options}
+\title{Risk-neutral Valuation for American Options with Recursion Method}
 \usage{
 rnv.american(fn, p, r, dt, K, S, type = "call")
 }
@@ -17,7 +17,7 @@ rnv.american(fn, p, r, dt, K, S, type = "call")
 
 \item{K}{A number representing the strike price}
 
-\item{S}{A number representing the current price}
+\item{S}{A matrix representing the stock price tree.}
 
 \item{type}{A string specifying the type of option, either "call" or "put", with "put" being the default option.}
 }
@@ -25,6 +25,6 @@ rnv.american(fn, p, r, dt, K, S, type = "call")
 A number representing the computed current value of the option.
 }
 \description{
-Risk-neutral Valuation for American Options
+Risk-neutral Valuation for American Options with Recursion Method
 }
 \keyword{internal}

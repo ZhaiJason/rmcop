@@ -14,6 +14,7 @@ Binomial.Basic(
   n,
   type = "call",
   style = "European",
+  all = FALSE,
   plot = FALSE
 )
 }

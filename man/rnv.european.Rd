@@ -2,7 +2,7 @@
 % Please edit documentation in R/binomial.R
 \name{rnv.european}
 \alias{rnv.european}
-\title{Risk-neutral Valuation for European Options}
+\title{Risk-neutral Valuation for European Options with Recursion Method}
 \usage{
 rnv.european(fn, p, r, dt)
 }
@@ -19,6 +19,6 @@ rnv.european(fn, p, r, dt)
 A number representing the computed current value of the option.
 }
 \description{
-Risk-neutral Valuation for European Options
+Risk-neutral Valuation for European Options with Recursion Method
 }
 \keyword{internal}

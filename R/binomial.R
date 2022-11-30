@@ -90,7 +90,6 @@ rnv.american <- function(fn, p, r, dt, K, S, type = "call") {
 #' @param n An integer representing the number of steps of the binomial model.
 #' @param type A string specifying the type of options, takes values "call" or "put, default takes value "call".
 #' @param style A string specifying the style of options, takes values "European" or "American", default takes value "European".
-#' @param bystep A logical evaluating to `TRUE` or `FALSE` indicating whether the pay-off of each step should be recorded during calculation.
 #' @param plot A logical evaluating to `TRUE` or `FALSE` indicating whether the binomial tree should be plotted.
 #'
 #' @return A number representing the computed current price of the option.
