@@ -35,7 +35,7 @@ seq_geom <- function(x, q, n) {
 #' @param type A character evaluating to either `"call"` or `"put"`, representing the type of the option; the default value is set to be `"call"`.
 #' @param style A character evaluating to either `"European"` or `"American"`, representing the style of the option; the default value is set to be `"American"`.
 #'
-#' @return
+#' @return A number representing the result options price.
 #'
 #' @keywords internal
 Binomial.rnv <- function(fn, p, r, n, dt, K = NULL, S = NULL,
@@ -84,7 +84,7 @@ Binomial.rnv <- function(fn, p, r, n, dt, K = NULL, S = NULL,
 #' @param r A number representing the continuously compounded yearly interest rate.
 #' @param t A number representing the time to option maturity (in years).
 #' @param n An integer representing the number of time steps into which the interval of length t is divided.
-#' @param σ A number representing the volatility (in standard deviation) of the rate of return on the underlying asset (yearly).
+#' @param sigma A number representing the volatility (in standard deviation) of the rate of return on the underlying asset (yearly).
 #' @param type A character evaluating to either `"call"` or `"put"`, representing the type of the option; the default value is set to be `"call"`.
 #' @param style A character evaluating to either `"European"` or `"American"`, representing the style of the option; the default value is set to be `"American"`.
 #' @param all A logical evaluating to `TRUE` or `FALSE` indicating whether the output should contain all option price, risk-neutral probability, and stock price tree, or option price only; the default value is set to be `FALSE`.
@@ -93,8 +93,8 @@ Binomial.rnv <- function(fn, p, r, n, dt, K = NULL, S = NULL,
 #' @return If `all = FALSE`, return only a number representing the result option price, where as `all = TRUE` return a list containing the result options price, risk-neutral probability, and the stock price tree (matrix). If `plot = TRUE`, the function will also produce a plot of the Binomial tree.
 #' @export
 #'
-#' @examples Binomial(K = 14, S = 8, u = 2, d = 0.5, r = 0.25, t = 0.75, n = 3, all = TRUE, style = "American")
-Binomial <- function(K, S, u = exp(σ * sqrt(t / n)), d = exp(-σ * sqrt(t / n)), r, t, n, σ = 0,
+#' @examples Binomial(14, 8, 2, 0.5, 0.25, 0.75, 3, all = TRUE, type = "put", style = "American")
+Binomial <- function(K, S, u = exp(sigma * sqrt(t / n)), d = exp(-sigma * sqrt(t / n)), r, t, n, sigma = 0,
                          type = "call",
                          style = "European",
                          all = FALSE,
@@ -143,15 +143,14 @@ Binomial <- function(K, S, u = exp(σ * sqrt(t / n)), d = exp(-σ * sqrt(t / n))
 
 #' Generating Trinomial Tree Matrix
 #'
-#' @param S0
-#' @param u
+#' @param S0 A number representing the current price of the underlying asset.
+#' @param u A number representing the ratio of an up jump in the asset value. Notice here a ratio for down jump is not specified, this is because under the Trinomial model we assume that d = 1/u.
 #' @param n An integer representing the number of time steps into which the interval of length t is divided.
 #'
 #' @return A matrix representing the Trinomial lattice tree.
 #'
 #' @keywords internal
 Trinomial.tree <- function(S0, u, n) {
-    u <- q
     d <- 1 / u
     dim <- c(n + 1, 1 + 2 * n)
     S <- matrix(nrow = dim[1], ncol = dim[2])
@@ -180,7 +179,7 @@ Trinomial.tree <- function(S0, u, n) {
 #' @param type A character evaluating to either `"call"` or `"put"`, representing the type of the option; the default value is set to be `"call"`.
 #' @param style A character evaluating to either `"European"` or `"American"`, representing the style of the option; the default value is set to be `"American"`.
 #'
-#' @return
+#' @return A number representing the result option price.
 #'
 #' @keywords internal
 Trinomial.rnv <- function(fn, p1, p2, p3, r, n, dt, K = NULL, S = NULL,
@@ -228,7 +227,7 @@ Trinomial.rnv <- function(fn, p1, p2, p3, r, n, dt, K = NULL, S = NULL,
 #' @param r A number representing the continuously compounded yearly interest rate.
 #' @param t A number representing the time to option maturity (in years).
 #' @param n An integer representing the number of time steps into which the interval of length t is divided.
-#' @param σ A number representing the volatility (in standard deviation) of the rate of return on the underlying asset (yearly).
+#' @param sigma A number representing the volatility (in standard deviation) of the rate of return on the underlying asset (yearly).
 #' @param type A character evaluating to either `"call"` or `"put"`, representing the type of the option; the default value is set to be `"call"`.
 #' @param style A character evaluating to either `"European"` or `"American"`, representing the style of the option; the default value is set to be `"American"`.
 #' @param all A logical evaluating to `TRUE` or `FALSE` indicating whether the output should contain all option price, risk-neutral probability, and stock price tree, or option price only; the default value is set to be `FALSE`.
@@ -237,19 +236,18 @@ Trinomial.rnv <- function(fn, p1, p2, p3, r, n, dt, K = NULL, S = NULL,
 #' @return If `all = FALSE`, return only a number representing the result option price, where as `all = TRUE` return a list containing the result options price, risk-neutral probability, and the stock price tree (matrix). If `plot = TRUE`, the function will also produce a plot of the Binomial tree.
 #' @export
 #'
-#' @examples Trinomial(K = 50, S = 8, u = 2, r = 0.25, t = 0.75, n = 3, all = TRUE, type = "put", style = "American")
-Trinomial <- function(K, S, u = exp(σ * sqrt(t / n)), r, t, n, σ = 0,
+#' @examples Trinomial(50, 8, 2, 0.05, 2, 3, type = "put", all = TRUE)
+Trinomial <- function(K, S, u, r, t, n, sigma = 0,
                       type = "call",
-                      style = "european",
+                      style = "European",
                       all = FALSE,
                       plot = FALSE) {
 
-    # Restrictions:
-    # u != 1, d = 1/u
+    # Restrict u != 1
 
     dt <- T/n
     M <- exp(r * dt)
-    V <- M^2 * (exp(σ^2 * dt) - 1)
+    V <- M^2 * (exp(sigma^2 * dt) - 1)
     p1 <- ((V + M^2 - M) * u - (M - 1)) / ((u - 1) * (u^2 - 1))
     p3 <- (u^2 * (V + M^2 - M) - u^3 * (M - 1)) / ((u - 1) * (u^2 - 1))
     p2 <- 1 - p1 - p3
