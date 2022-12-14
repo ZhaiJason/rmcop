@@ -75,7 +75,7 @@ Binomial.rnv <- function(fn, p, r, n, dt, K = NULL, S = NULL,
 
 ## Cox, Ross & Rubinstein Binomial Model =======================================
 
-#' Cox, Ross & Rubinstein Lattice Binomial Options Pricing Model
+#' Cox, Ross & Rubinstein Binomial Lattice Model
 #'
 #' @param K A number representing the exercise price of option.
 #' @param S A number representing the current price of option, this is also the asset value after a horizontal jump.

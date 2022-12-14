@@ -80,7 +80,7 @@ Trinomial.rnv <- function(fn, p1, p2, p3, r, n, dt, K = NULL, S = NULL,
 
 ## Phelim Boyle Trinomial Model ================================================
 
-#' Phelim Boyle Trinomial Lattice Model for Option Pricing
+#' Phelim Boyle Trinomial Lattice Model
 #'
 #' @param K A number representing the exercise price of option.
 #' @param S A number representing the current price of option, this is also the asset value after a horizontal jump.
