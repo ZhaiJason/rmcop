@@ -7,6 +7,7 @@
 Binomial.rnv(
   fn,
   p,
+  q,
   r,
   n,
   dt,
@@ -19,9 +20,13 @@ Binomial.rnv(
 \arguments{
 \item{fn}{A numeric vector containing all possible stock prices at the final step/state of the binomial tree.}
 
-\item{p}{A number representing the risk-neutral probability.}
+\item{p}{A number representing the risk-neutral probability for an upward price movement.}
+
+\item{q}{A number representing the risk-neutral probability for a downward price movement.}
 
 \item{r}{A number representing the continuously compounded yearly interest rate.}
+
+\item{n}{}
 
 \item{dt}{A number representing the length in time of each step.}
 

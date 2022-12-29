@@ -1,25 +1,26 @@
-## Binomial ====================================================================
+# Binomial Model ===============================================================
 
-## [Internal] Geometric Sequence for Vectors ===================================
+## [Internal] Binomial Tree ====================================================
 
-#' Geometric Sequence for Vectors using Recursion Method
+#' Generating Binomial Tree Matrix
 #'
-#' @param x An vector used as the base of calculation.
-#' @param q An fixed ratio.
-#' @param n A number specifying the number of times we wish to advanced for the geometric sequence.
+#' @param S0 A number representing the current price of the underlying asset.
+#' @param u A number representing the ratio of an upward price movement.
+#' @param d A number representing the ratio of an downward price movement.
+#' @param n An integer representing the number of time steps into which the interval of length t is divided.
 #'
-#' @return A vector concatenating the original vector and the resulting geometric sequences.
+#' @return A matrix representing the Binomial lattice tree.
 #'
 #' @keywords internal
-seq_geom <- function(x, q, n) {
-    seq_geom.component <- function(x, q, n, iter = 0) {
-        if (iter >= n) {
-            x
-        } else {
-            c(x, seq_geom.component(x * q, q, n, iter = iter + 1))
-        }
+Binomial.tree <- function(S0, u, d, n) {
+    dim <- n + 1
+    S <- matrix(nrow = dim, ncol = dim) # Predefine the size
+    temp <- c(S0)
+    for (i in 1:dim) {
+        S[i, ] <- c(temp, rep(NA, dim - i))
+        temp <- c(temp[1] * d, temp * u)
     }
-    seq_geom.component(x, q, n)
+    S
 }
 
 ## [Internal] Backward Recursive Risk-neutral Valuation for Binomial Model =====
@@ -27,21 +28,22 @@ seq_geom <- function(x, q, n) {
 #' Backward Recursive Risk-neutral Valuation for Binomial Model
 #'
 #' @param fn A numeric vector containing all possible stock prices at the final step/state of the binomial tree.
-#' @param p A number representing the risk-neutral probability.
+#' @param p A number representing the risk-neutral probability for an upward price movement.
+#' @param q A number representing the risk-neutral probability for a downward price movement.
 #' @param r A number representing the continuously compounded yearly interest rate.
 #' @param dt A number representing the length in time of each step.
 #' @param K A number representing the exercise price of option, needed only when calculating an American option.
 #' @param S A number representing the current price of option, needed only when calculating an American option.
 #' @param type A character evaluating to either `"call"` or `"put"`, representing the type of the option; the default value is set to be `"call"`.
 #' @param style A character evaluating to either `"European"` or `"American"`, representing the style of the option; the default value is set to be `"American"`.
+#' @param n
 #'
 #' @return A number representing the result options price.
 #'
 #' @keywords internal
-Binomial.rnv <- function(fn, p, r, n, dt, K = NULL, S = NULL,
+Binomial.rnv <- function(fn, p, q, r, n, dt, K = NULL, S = NULL,
                          type = "call",
                          style = "European") {
-    q <- 1 - p
     if (style == "European") {
         rnv.European <- function(fn, p, r, dt, state = n) {
             if (length(fn) <= 0) {
@@ -70,6 +72,8 @@ Binomial.rnv <- function(fn, p, r, n, dt, K = NULL, S = NULL,
             }
         }
         rnv.American(fn, p, r, dt, K, S, type = type)
+    } else {
+        stop("Invalid option style. `style` must be specified to either 'European' or 'American'.")
     }
 }
 
@@ -101,11 +105,11 @@ Binomial <- function(K, S, u = exp(sigma * sqrt(t / n)), d = exp(-sigma * sqrt(t
                          plot = FALSE) {
 
     dt <- t / n # Compute delta t
-    p <- (exp(r * dt) - d) / (u - d) # Compute risk-neutral probability
-    S0 <- S * d ^ (0:n) # Stores the route of stock prices which falls every time.
+    p <- (exp(r * dt) - d) / (u - d) # Compute riskless probability for an upward price movement
+    q <- 1 - p # Compute riskless probability for a downward price movement
 
     # Store the stock prices of the tree for each state in a matrix `price_tree`
-    price_tree <- matrix(seq_geom(S0, u/d, n), nrow = n + 1) # Consider remove the excessive calculation by replacing the geom_seq method
+    price_tree <- Binomial.tree(S, u, d, n)
 
     # Alternative method for generating the matrix, a bit slower than using seq_geom method.
     # price_tree <- t(sapply(S0, function(x) {x * (u / d) ^ (0:n)}))
@@ -118,10 +122,12 @@ Binomial <- function(K, S, u = exp(sigma * sqrt(t / n)), d = exp(-sigma * sqrt(t
         fn <- sapply(Sn, function(x) {max(x - K, 0)})
     } else if (type == "put") {
         fn <- sapply(Sn, function(x) {max(K - x, 0)})
+    } else {
+        stop("Invalid option type. `type` must be specified to either 'call' or 'put'.")
     }
 
     # Calculate the option value at current time.
-    price <- Binomial.rnv(fn, p, r, n, dt, K, S = price_tree, type = type, style = style)
+    price <- Binomial.rnv(fn, p, q, r, n, dt, K, S = price_tree, type = type, style = style)
 
     # PLOTTING FUNCTION NOT ADDED
 
@@ -136,3 +142,4 @@ Binomial <- function(K, S, u = exp(sigma * sqrt(t / n)), d = exp(-sigma * sqrt(t
         price
     }
 }
+
