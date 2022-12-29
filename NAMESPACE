@@ -2,5 +2,5 @@
 
 export(Binomial)
 export(Trinomial)
-export(fv)
-export(pv)
+export(d1)
+export(d2)
