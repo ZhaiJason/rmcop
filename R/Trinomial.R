@@ -1,6 +1,6 @@
-# Trinomial ====================================================================
+# Trinomial Model ==============================================================
 
-## Generate Trinomial Tree =====================================================
+## [Internal] Generate Trinomial Tree ==========================================
 
 #' Generating Trinomial Tree Matrix
 #'
@@ -17,7 +17,7 @@ Trinomial.tree <- function(S0, u, n) {
     S <- matrix(nrow = dim[1], ncol = dim[2])
     temp <- c(S0)
     for (i in 1:dim[1]) {
-        S[i, ] <- c(temp, rep(NA, 2 * (n + 1 - i)))
+        S[i, ] <- c(temp, rep(NA, 2 * (dim[1] - i)))
         temp <- c(temp[1] * d, temp, temp[length(temp)] * u)
     }
     S
@@ -75,6 +75,8 @@ Trinomial.rnv <- function(fn, p1, p2, p3, r, n, dt, K = NULL, S = NULL,
             }
         }
         rnv.American(fn, p1, p2, p3, r, dt, K, S, type = type)
+    } else {
+        stop("Invalid option style. `style` must be specified to either 'European' or 'American'.")
     }
 }
 
@@ -109,9 +111,9 @@ Trinomial <- function(K, S, u, r, t, n, sigma = 0,
     dt <- T/n
     M <- exp(r * dt)
     V <- M^2 * (exp(sigma^2 * dt) - 1)
-    p1 <- ((V + M^2 - M) * u - (M - 1)) / ((u - 1) * (u^2 - 1))
-    p3 <- (u^2 * (V + M^2 - M) - u^3 * (M - 1)) / ((u - 1) * (u^2 - 1))
-    p2 <- 1 - p1 - p3
+    p1 <- ((V + M^2 - M) * u - (M - 1)) / ((u - 1) * (u^2 - 1)) # Compute riskless probability for an upward price movement
+    p3 <- (u^2 * (V + M^2 - M) - u^3 * (M - 1)) / ((u - 1) * (u^2 - 1)) # Compute riskless probability for a downward price movement
+    p2 <- 1 - p1 - p3 # Compute riskless probability for a horizontal price movement
 
     price_tree <- Trinomial.tree(S, u, n)
     Sn <- price_tree[n + 1, ]
@@ -120,6 +122,8 @@ Trinomial <- function(K, S, u, r, t, n, sigma = 0,
         fn <- sapply(Sn, function(x) {max(x - K, 0)})
     } else if (type == "put") {
         fn <- sapply(Sn, function(x) {max(K - x, 0)})
+    } else {
+        stop("Invalid option type. `type` must be specified to either 'call' or 'put'.")
     }
 
     price <- Trinomial.rnv(fn, p1, p2, p3, r, n, dt, K, S = price_tree, type = type, style = style)
