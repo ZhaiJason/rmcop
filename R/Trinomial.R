@@ -1,4 +1,4 @@
-# Trinomial Model ==============================================================
+# Trinomial Engine for price.option.trinomial ==================================
 
 ## [Internal] Generate Trinomial Tree ==========================================
 
@@ -33,33 +33,33 @@ Trinomial.tree <- function(S0, u, n) {
 #' @param p1 A number representing the risk-neutral probability of an up jump of the asset price.
 #' @param p2 A number representing the risk-neutral probability of an horizontal jump of the asset price.
 #' @param p3 A number representing the risk-neutral probability of an down jump of the asset price.
-#' @param r A number representing the continuously compounded yearly interest rate.
+#' @param r A number representing the (assumed fixed) continuously compounded yearly interest rate.
 #' @param dt A number representing the length in time of each step.
-#' @param K A number representing the exercise price of option, needed only when calculating an American option.
-#' @param S A number representing the current price of option, needed only when calculating an American option.
+#' @param K A number representing the exercise price of option, needed only when calculating an american option.
+#' @param S A number representing the current price of option, needed only when calculating an american option.
 #' @param type A character evaluating to either `"call"` or `"put"`, representing the type of the option; the default value is set to be `"call"`.
-#' @param style A character evaluating to either `"European"` or `"American"`, representing the style of the option; the default value is set to be `"American"`.
+#' @param style A character evaluating to either `"european"` or `"american"`, representing the style of the option; the default value is set to be `"american"`.
 #'
 #' @return A number representing the result option price.
 #'
 #' @keywords internal
 Trinomial.rnv <- function(fn, p1, p2, p3, r, n, dt, K = NULL, S = NULL,
                           type = "call",
-                          style = "European") {
+                          style = "european") {
 
-    if (style == "European") {
-        rnv.European <- function(fn, p1, p2, p3, r, dt, state = n) {
+    if (style == "european") {
+        rnv.european <- function(fn, p1, p2, p3, r, dt, state = n) {
             if (state <= 0) {
                 fn
             } else {
                 l <- 1 + 2 * (state - 1)
                 fm <- sapply(1:l, function(i) {exp(-r * dt) * (p1 * fn[i + 2] + p2 * fn[i + 1] + p3 * fn[i])})
-                rnv.European(fm, p1, p2, p3, r, dt, state = state - 1)
+                rnv.european(fm, p1, p2, p3, r, dt, state = state - 1)
             }
         }
-        rnv.European(fn, p1, p2, p3, r, dt, state = n)
-    } else if (style == "American") {
-        rnv.American <- function(fn, p1, p2, p3, r, dt, K, S, type = type, state = n) {
+        rnv.european(fn, p1, p2, p3, r, dt, state = n)
+    } else if (style == "american") {
+        rnv.american <- function(fn, p1, p2, p3, r, dt, K, S, type = type, state = n) {
             if (state <= 0) {
                 fn
             } else {
@@ -71,12 +71,12 @@ Trinomial.rnv <- function(fn, p1, p2, p3, r, n, dt, K = NULL, S = NULL,
                         max(max(K - S[state, i], 0), exp(-r * dt) * (p1 * fn[i + 2] + p2 * fn[i + 1] + p3 * fn[i]))
                     }
                 })
-                rnv.American(fm, p1, p2, p3, r, dt, K, S, type = type, state = state - 1)
+                rnv.american(fm, p1, p2, p3, r, dt, K, S, type = type, state = state - 1)
             }
         }
-        rnv.American(fn, p1, p2, p3, r, dt, K, S, type = type)
+        rnv.american(fn, p1, p2, p3, r, dt, K, S, type = type)
     } else {
-        stop("Invalid option style. `style` must be specified to either 'European' or 'American'.")
+        stop("Invalid option style. `style` must be specified to either 'european' or 'american'.")
     }
 }
 
@@ -92,7 +92,7 @@ Trinomial.rnv <- function(fn, p1, p2, p3, r, n, dt, K = NULL, S = NULL,
 #' @param n An integer representing the number of time steps into which the interval of length t is divided.
 #' @param sigma A number representing the volatility (in standard deviation) of the rate of return on the underlying asset (yearly).
 #' @param type A character evaluating to either `"call"` or `"put"`, representing the type of the option; the default value is set to be `"call"`.
-#' @param style A character evaluating to either `"European"` or `"American"`, representing the style of the option; the default value is set to be `"American"`.
+#' @param style A character evaluating to either `"european"` or `"american"`, representing the style of the option; the default value is set to be `"american"`.
 #' @param all A logical evaluating to `TRUE` or `FALSE` indicating whether the output should contain all option price, risk-neutral probability, and stock price tree, or option price only; the default value is set to be `FALSE`.
 #' @param plot A logical evaluating to `TRUE` or `FALSE` indicating whether the binomial tree should be plotted; the default value is set to be `FALSE`.
 #'
@@ -102,7 +102,7 @@ Trinomial.rnv <- function(fn, p1, p2, p3, r, n, dt, K = NULL, S = NULL,
 #' @examples Trinomial(50, 8, 2, 0.05, 2, 3, type = "put", all = TRUE)
 Trinomial <- function(K, S, u, r, t, n, sigma = 0,
                       type = "call",
-                      style = "European",
+                      style = "european",
                       all = FALSE,
                       plot = FALSE) {
 
