@@ -1,7 +1,11 @@
 # Creating new option object ===================================================
 
+# Following functions are exported:
+# option
+# option.env
+
 ## Option ======================================================================
-#' Create new `option` class object
+#' Initialise new `option` class object
 #'
 #' @param style The style of the option.
 #' @param ... Arguments required are determined by specified option style.
@@ -17,13 +21,9 @@
 #' option("european", option = "binary")
 option <- function(style, option = "vanilla", ...) {
 
-    # List of supported styles: american, european, asian
-
     obj <- list(
         "style" = style
     )
-
-    # class(obj) <- "option"
 
     # Distribute to corresponding initialisation function according to specified arguments
     if (option == "vanilla") {
@@ -31,7 +31,6 @@ option <- function(style, option = "vanilla", ...) {
     } else {
         obj <- option.exotic(obj, option, ...)
     }
-
     obj
 }
 
@@ -46,7 +45,7 @@ option <- function(style, option = "vanilla", ...) {
 #' @return
 #'
 #' @keywords internal
-option.vanilla <- function(obj, type, K, t = NA) {
+option.vanilla <- function(obj, type, K, t) {
     obj <- c(
         obj,
         "type" = type,
@@ -68,7 +67,7 @@ option.vanilla <- function(obj, type, K, t = NA) {
 #'
 #' @keywords internal
 option.exotic <- function(obj, option, ...) {
-    obj <- eval(parse(text = paste0( "option.exotic.", tolower(option), "(obj, ...)" ))) # Direct to corresponding initialisation function
+    obj <- get(paste0("option.exotic.", option))(obj, ...) # Direct to corresponding initialisation function
     class(obj) <- append(class(obj), "exotic", after = 1)
     obj
 }
@@ -83,7 +82,7 @@ option.exotic <- function(obj, option, ...) {
 #' @return
 #'
 #' @keywords internal
-option.exotic.asian <- function(obj, type, K, t = NA) {
+option.exotic.asian <- function(obj, type, K, t) {
     obj <- c(
         obj,
         "type" = type,
@@ -103,7 +102,7 @@ option.exotic.asian <- function(obj, type, K, t = NA) {
 #' @return
 #'
 #' @keywords internal
-option.exotic.barrier <- function(obj, barrier, is.knockout = TRUE, t = NA) {
+option.exotic.barrier <- function(obj, barrier, is.knockout = TRUE, t) {
     obj <- c(
         obj,
         "barrier" = barrier,
@@ -123,7 +122,7 @@ option.exotic.barrier <- function(obj, barrier, is.knockout = TRUE, t = NA) {
 #' @return
 #'
 #' @keywords internal
-option.exotic.binary <- function(obj, payout, t = NA) {
+option.exotic.binary <- function(obj, payout, t) {
     obj <- c(
         obj,
         "payout" = payout,
@@ -143,7 +142,7 @@ option.exotic.binary <- function(obj, payout, t = NA) {
 #' @return
 #'
 #' @keywords internal
-option.exotic.lookback <- function(obj, type, K, t = NA) {
+option.exotic.lookback <- function(obj, type, K, t) {
     obj <- c(
         obj,
         "type" = type,
@@ -152,4 +151,35 @@ option.exotic.lookback <- function(obj, type, K, t = NA) {
     )
     class(obj) <- c("lookback", "option")
     obj
+}
+
+# Creating new option environment ==============================================
+
+#' Initialise new `option.env` class object
+#'
+#' @param method A character specifying the method that will be used for option pricing. The default value for this argument is `"mc"`, which represents to use Monte Carlo approach.
+#' @param S A number specifying the current price of the underlying asset.
+#' @param r A number specifying the (assumed fixed) continuously compounded annual interest rate.
+#' @param q A number specifying the (assumed fixed) continuously compounded annual dividend yield rate.
+#' @param sigma A number specifying the (assumed fixed) annual volatility measure. Notice when pricing with `mc` method, it can be also evaluated to a corresponding `n` by `m` matrix, which allows variation of volatility through the option(s)'s life; this should, however, be exercised with caution, as this is not the intended application of the algorithm.
+#' @param ... Other arguments required by specified `method`.
+#' @param all A boolean specifying whether the pricing function should return only the result price (if `FALSE`) or other (maybe useful) data during computation (if `TRUE`). The default value for this argument is `FALSE`.
+#'
+#' @return
+#' @export
+#'
+#' @examples
+#'
+option.env <- function(method = "mc", S, r, q = 0, sigma, n = NULL, steps = NULL) {
+    env <- list(
+        "method" = method,
+        "S" = S,
+        "r" = r,
+        "q" = q,
+        "sigma" = sigma,
+        "n" = n,
+        "steps" = steps
+    )
+    class(env) <- "option.env"
+    env
 }

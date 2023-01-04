@@ -1,57 +1,90 @@
 # Top Level Pricing Functions for Options ======================================
 
+# Following functions are exported:
+# ALL FUNCTIONS
+
 #' Pricing `option` Class Object
 #'
 #' @param obj
+#' @param env The predefined `option.env` object, which contains specified arguments
 #' @param method
+#' @param ...
+#' @param all A boolean specifying whether the pricing function should return only the result price (if `FALSE`) or other (maybe useful) data during computation (if `TRUE`). The default value for this argument is `FALSE`.
 #'
 #' @return
 #' @export
 #'
 #' @examples
-price.option <- function(obj, method = "mc", ...) {
-    eval(parse(text = paste0( "price.option.", method, "(obj, ...)" )))
+#' op <- option("european", "vanilla", "call", 20, 0.75)
+#' op.env <- option.env(S = 20, r = 0.03, q = 0.01, sigma = 0.05)
+price.option <- function(obj, env, method = env$method, n = env$n, steps = env$steps, ... , all = FALSE) {
+    if (is.null(method)) stop("Pricing method not specified")
+    res <- get(paste0("price.option.", method))(obj, env, n, steps, ..., all)
+    res
 }
 
 #' Option Pricing via Monte Carlo Method
 #'
 #' @param obj
+#' @param env
+#' @param ...
+#' @param all
 #'
 #' @return
 #' @export
 #'
 #' @examples
-price.option.mc <- function(obj, ...) {
-    if (class(obj)[-2] == "vanilla") {
-        res <- vanilla.mc(obj, ...)
-    } else if (class(obj)[-2] == "exotic") {
-        res <- exotic.mc(obj, ...)
-    }
+price.option.mc <- function(obj, env, n = env$n, steps = env$steps, all = FALSE) {
+    if (is.null(n)) stop("n is not specified")
+    if (is.null(steps)) stop("steps is not specified")
+    res <- get(paste0(class(obj)[1], ".mc"))(obj, env, n, steps, all)
     res
 }
 
-#' Option Pricing via Binomial Model
+#' Title
 #'
 #' @param obj
+#' @param env
+#' @param ...
+#' @param all
 #'
 #' @return
 #' @export
 #'
 #' @examples
-price.option.binomial <- function(obj, ...) {
-    if (class(obj)[-2] == "vanilla") {
-        res <- vanilla.binomial(obj, ...)
-    } else if (class(obj)[-2] == "exotic") {
-        res <- exotic.binomial(obj, ...)
-    }
+price.option.bs <- function(obj, env, all = FALSE) {
+    res <- get(paste0(class(obj)[1], ".bs"))(obj, env, all)
     res
 }
 
-price.option.trinomial <- function(obj, ...) {
-    if (class(obj)[-2] == "vanilla") {
-        res <- NA
-    } else if (class(obj)[-2] == "exotic") {
-        res <- NA
-    }
+#' Option Pricing via Binomial Lattice Model
+#'
+#' @param obj
+#' @param env
+#' @param ...
+#' @param all
+#'
+#' @return
+#' @export
+#'
+#' @examples
+price.option.binomial <- function(obj, env, all = FALSE) {
+    res <- get(paste0(class(obj)[1], ".binomial"))(obj, env, all)
+    res
+}
+
+#' Option Pricing via Trinomial Lattice Model
+#'
+#' @param obj
+#' @param env
+#' @param ...
+#' @param all
+#'
+#' @return
+#' @export
+#'
+#' @examples
+price.option.trinomial <- function(obj, env, all = FALSE) {
+    res <- get(paste0(class(obj)[1], ".trinomial"))(obj, env, all)
     res
 }

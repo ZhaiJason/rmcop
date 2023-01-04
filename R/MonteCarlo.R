@@ -1,65 +1,125 @@
-# Monte Carlo option pricing procedure =========================================
+# Engine =======================================================================
 
-
-
-#' Pricing vanilla option using Monte Carlo method
+#' Engine for Monte Carlo Simulation on Asset Price Trajectory
 #'
 #' @importFrom stats rnorm
 #'
-#' @param obj The predefined `option` class object.
-#' @param S A number of the current price of the underlying asset.
-#' @param r A number representing the continuously compounded yearly interest rate.
-#' @param t A number representing the time to option maturity (in years).
-#' @param sigma A number representing the (assumed fixed) continuously compounded yearly interest rate.
-#' @param n An integer representing the number of Monte Carlo replications of asset price to take.
+#' @param type
+#' @param K
+#' @param S
+#' @param r
+#' @param q
+#' @param t
+#' @param sigma
+#' @param n
+#' @param m
 #'
 #' @return
-#' @export
 #'
-#' @examples
-#' euro1 <- option("european", type = "call", K = 20)
-#' price.option(euro1, S = 20, t = 0.5, r = 0.01, sigma = 0.1, n = 100, all = FALSE)
-vanilla.mc <- function(obj, S, r, t = obj$t, sigma, n, all = FALSE) {
+#' @keywords internal
+mc.engine <- function(type, K, t, S, r, q, sigma, n, steps) {
 
-    # Extract object information
-    if (is.na(t)) {stop("Maturity t not specified")}
-    style <- obj$style
-    type <- obj$type
-    K <- obj$K
+    # Generate n random samples from N(0,1)
+    Z_i <- matrix(rnorm(n * steps), nrow = n)
 
-    # Apply MC
-    if (style == "european") {
-        # Generate n random samples from N(0,1)
-        Z_i <- matrix(rnorm(n), nrow = n)
+    if (steps == 1) { # Path independent simulation
+
         # Compute corresponding stock prices at maturity
-        S_i <- S * exp((r - sigma^2 / 2) * t + sigma * sqrt(t) * Z_i)
+        S_i <- S * exp((r - q - sigma^2 / 2) * t + sigma * sqrt(t) * Z_i)
+        S_i <- S_i * exp(-q * t) # Adjust the asset price for dividends
+
         # Compute corresponding discounted price at current time
         if (type == "call") {
             C_i <- exp(-r * t) * pmax(S_i - K, 0)
         } else if (type == "put") {
             C_i <- exp(-r * t) * pmax(K - S_i, 0)
         }
-        # Obtain the estimate of option price by taking average of C_i
-        C.estimate <- mean(C_i)
+
+    } else { # Path dependent simulation
+
+        dt <- t / steps
+
+        # Get logarithm of price change per step
+        log_dS <- (r - q - sigma^2 / 2) * dt + sigma * sqrt(dt) * Z_i
+
+        # Use vectorised MC method to compute logarithm of S(t) at each time step
+        log_S_i <- log(S) + apply(log_dS, 1, cumsum)
+        S_i <- exp(log_S_i) # Obtain the simulated stock price by taking exponential
+        S_i <- S_i * exp(-q * t) # Adjust the asset price for dividends
+
+        # Compute corresponding discounted price at current time
+        if (type == "call") {
+            C_i <- exp(-r * t) * pmax(S_i - K, 0)
+        } else if (type == "put") {
+            C_i <- exp(-r * t) * pmax(K - S_i, 0)
+        }
+    }
+    C_i
+}
+
+#' Compute Monte Carlo Model's Standard Error
+#'
+#' @param C_i
+#' @param C.estimate
+#' @param n
+#'
+#' @return
+#'
+#' @keywords internal
+mc.SE <- function(C_i, C.estimate, n) {
+    s_c <- sqrt(sum(C_i - C.estimate)^2 / (n - 1))
+    SE <- s_c / sqrt(n)
+    SE
+}
+
+# Monte Carlo option pricing procedure =========================================
+
+#' Pricing vanilla option using Monte Carlo method
+#'
+#' @param obj The predefined `option` class object.
+#' @param env The predefined `option.env` class object, or a list specifying method's corresponding arguments.
+#' @param n An integer specifying the number of Monte Carlo replications of asset price to take.
+#' @param m An integer specifying the number of time steps the option(s)'s life will be divided into.
+#' @param all A boolean specifying whether the pricing function should return only the result price (if `FALSE`) or other (maybe useful) data during computation (if `TRUE`). The default value for this argument is `FALSE`.
+#'
+#' @return
+#'
+#' @keywords internal
+vanilla.mc <- function(obj, env, n, steps, all = FALSE) {
+
+    # Check object integrity, CAN BE OMITTED
+    if (any(class(obj) != c("vanilla", "option"))) stop("Invalid obj class")
+    if (class(env) != "option.env") stop("Invalid env class")
+
+    # Extract objects properties
+    style <- obj$style
+    type <- obj$type
+    K <- obj$K
+    t <- obj$t
+    S <- env$S
+    r <- env$r
+    q <- env$q
+    sigma <- env$sigma
+
+    # Apply MC
+    if (style == "european") {
+        C_i <- mc.engine(type, K, t, S, r, q, sigma, n, steps)
     } else if (style == "american") {
         stop("American option pricing via MC not supported")
     }
 
-    # Compute standard error of the estimate
-    s_c <- sqrt(sum(C_i - C.estimate)^2 / (n - 1))
-    SE <- s_c / sqrt(n)
+    # Obtain the estimate of option price by taking average of C_i
+    C.estimate <- mean(C_i)
 
-    # Return results
-    if (all) {
-        list(
-            "C.estimate" = C.estimate,
-            "SE" = SE,
-            "rv" = Z_i,
-            "path" = S_i
-        )
-    } else {
-        C.estimate
-    }
+    # Compute standard error of the estimate
+    SE <- mc.SE(C_i, C.estimate, n)
+
+    # Return result
+    list(
+        "C.estimate" = C.estimate,
+        "SE" = SE,
+        "C_i" = C_i
+    )
 }
 
 #' Pricing Asian option using Monte Carlo method
@@ -76,52 +136,10 @@ vanilla.mc <- function(obj, S, r, t = obj$t, sigma, n, all = FALSE) {
 #' @param all
 #'
 #' @return
-#' @export
 #'
-#' @examples
-asian.mc <- function(obj, S, r, t = obj$t, sigma, n, m, all = FALSE) {
+#' @keywords internal
+asian.mc <- function(obj, env = NULL, S, r, t = obj$t, sigma, n, m, all = FALSE) {
 
-    # Extract object information
-    if (is.na(t)) {stop("Maturity t not specified")}
-    dt <- t / m # Set time change for each set
-    style <- obj$style
-    type <- obj$type
-    K <- obj$K
 
-    # Apply MC
-    if (style == "european") {
-        # Generate n random samples from N(0,1)
-        Z_i <- matrix(rnorm(n), nrow = n, ncol = m)
-
-        # # Compute corresponding stock price movements
-        # dS <- S * exp((r - sigma^2 / 2) * dt + sigma * sqrt(dt) * Z_i)
-        # # Compute corresponding discounted price at current time
-        # if (type == "call") {
-        #     C_i <- exp(-r * t) * pmax(S_i - K, 0)
-        # } else if (type == "put") {
-        #     C_i <- exp(-r * t) * pmax(K - S_i, 0)
-        # }
-        # # Obtain the estimate of option price by taking average of C_i
-        # C.estimate <- mean(C_i)
-    } else if (style == "american") {
-        stop("American option pricing via MC not supported")
-    }
-
-    # Compute standard error of the estimate
-    s_c <- sqrt(sum(C_i - C.estimate)^2 / (n - 1))
-    SE <- s_c / sqrt(n)
-
-    # Return results
-    if (all) {
-        list(
-            "C.estimate" = C.estimate,
-            "SE" = SE,
-            "rv" = Z_i,
-            "path" = S_i
-        )
-    } else {
-        C.estimate
-    }
 }
 
-# price.option(euro1, S = 20, t = 1, r = 0.01, sigma = 0.03, n = 10)

@@ -1,4 +1,4 @@
-# Trinomial Engine for price.option.trinomial ==================================
+# Engine =======================================================================
 
 ## [Internal] Generate Trinomial Tree ==========================================
 
@@ -80,7 +80,7 @@ Trinomial.rnv <- function(fn, p1, p2, p3, r, n, dt, K = NULL, S = NULL,
     }
 }
 
-## Phelim Boyle Trinomial Model ================================================
+# Model ========================================================================
 
 #' Phelim Boyle Trinomial Lattice Model
 #'
