@@ -1,7 +1,5 @@
 # Engine =======================================================================
 
-## [Internal] Black-Scholes d1 =================================================
-
 #' Compute d1 in Black-Scholes Formula
 #'
 #' @param S A number representing the current price of the underlying asset.

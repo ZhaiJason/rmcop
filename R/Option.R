@@ -14,20 +14,23 @@
 #' @export
 #'
 #' @examples
-#' # Create an European call option with strike price 10 and mature in 2 years
-#' option("european", is.vanilla = TRUE, type = "call", K = 10, t = 2)
-#'
-#' # Create an Binary option with payout 10 and mature
-#' option("european", option = "binary")
-option <- function(style, option = "vanilla", ...) {
+#' vanilla1 <- option("european", "vanilla", "call", K = 20, t = 1)
+#' asian1 <- option("european", "asian", "call", K = 20, t = 1)
+#' barrier1 <- option("european", "barrier", "call", K = 20, t = 1, barrier = 21, is.knockout = TRUE)
+#' binary1 <- option("european", "binary", "call", K = 20, t = 1, payout = 5)
+#' lookback1 <- option("european", "lookback", "call", K = 20, t = 1, is.fixed = TRUE)
+option <- function(style, option = "vanilla", type, K, t, ...) {
 
     obj <- list(
-        "style" = style
+        "style" = style,
+        "type" = type,
+        "K" = K,
+        "t" = t
     )
 
     # Distribute to corresponding initialisation function according to specified arguments
     if (option == "vanilla") {
-        obj <- option.vanilla(obj, ...)
+        obj <- option.vanilla(obj)
     } else {
         obj <- option.exotic(obj, option, ...)
     }
@@ -38,20 +41,11 @@ option <- function(style, option = "vanilla", ...) {
 #' Initialise vanilla option
 #'
 #' @param obj
-#' @param type
-#' @param K
-#' @param t
 #'
 #' @return
 #'
 #' @keywords internal
-option.vanilla <- function(obj, type, K, t) {
-    obj <- c(
-        obj,
-        "type" = type,
-        "K" = K,
-        "t" = t
-    )
+option.vanilla <- function(obj) {
     class(obj) <- c("vanilla", "option")
     obj
 }
@@ -62,33 +56,25 @@ option.vanilla <- function(obj, type, K, t) {
 #' @param obj
 #' @param option
 #' @param ...
-#'
-#' @return
-#'
-#' @keywords internal
-option.exotic <- function(obj, option, ...) {
-    obj <- get(paste0("option.exotic.", option))(obj, ...) # Direct to corresponding initialisation function
-    class(obj) <- append(class(obj), "exotic", after = 1)
-    obj
-}
-
-#' Initialise Asian option
-#'
-#' @param obj
-#' @param type
 #' @param K
 #' @param t
 #'
 #' @return
 #'
 #' @keywords internal
-option.exotic.asian <- function(obj, type, K, t) {
-    obj <- c(
-        obj,
-        "type" = type,
-        "K" = K,
-        "t" = t
-    )
+option.exotic <- function(obj, option, ...) {
+    obj <- get(paste0("option.exotic.", option))(obj, ...) # Direct to corresponding initialisation function
+    obj
+}
+
+#' Initialise Asian option
+#'
+#' @param obj
+#'
+#' @return
+#'
+#' @keywords internal
+option.exotic.asian <- function(obj) {
     class(obj) <- c("asian", "option")
     obj
 }
@@ -102,12 +88,11 @@ option.exotic.asian <- function(obj, type, K, t) {
 #' @return
 #'
 #' @keywords internal
-option.exotic.barrier <- function(obj, barrier, is.knockout = TRUE, t) {
+option.exotic.barrier <- function(obj, barrier, is.knockout = TRUE) {
     obj <- c(
         obj,
         "barrier" = barrier,
-        "is.knockout" = is.knockout,
-        "t" = t
+        "is.knockout" = is.knockout
     )
     class(obj) <- c("barrier", "option")
     obj
@@ -117,16 +102,14 @@ option.exotic.barrier <- function(obj, barrier, is.knockout = TRUE, t) {
 #'
 #' @param obj
 #' @param payout
-#' @param t
 #'
 #' @return
 #'
 #' @keywords internal
-option.exotic.binary <- function(obj, payout, t) {
+option.exotic.binary <- function(obj, payout) {
     obj <- c(
         obj,
-        "payout" = payout,
-        "t" = t
+        "payout" = payout
     )
     class(obj) <- c("binary", "option")
     obj
@@ -135,19 +118,15 @@ option.exotic.binary <- function(obj, payout, t) {
 #' Initialise lookback option
 #'
 #' @param obj
-#' @param type
-#' @param K
-#' @param t
+#' @param is.fixed A boolean specifying if the lookback option is "fixed" or "floating" lookback option.
 #'
 #' @return
 #'
 #' @keywords internal
-option.exotic.lookback <- function(obj, type, K, t) {
+option.exotic.lookback <- function(obj, is.fixed = TRUE) {
     obj <- c(
         obj,
-        "type" = type,
-        "K" = K,
-        "t" = t
+        "is.fixed" = is.fixed
     )
     class(obj) <- c("lookback", "option")
     obj
@@ -169,7 +148,7 @@ option.exotic.lookback <- function(obj, type, K, t) {
 #' @export
 #'
 #' @examples
-#'
+#' env1 <- option.env(S = 20, r = 0.02, q = 0.01, sigma = 0.05, n = 100)
 option.env <- function(method = "mc", S, r, q = 0, sigma, n = NULL, steps = NULL) {
     env <- list(
         "method" = method,

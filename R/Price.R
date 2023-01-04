@@ -17,6 +17,7 @@
 #' @examples
 #' op <- option("european", "vanilla", "call", 20, 0.75)
 #' op.env <- option.env(S = 20, r = 0.03, q = 0.01, sigma = 0.05)
+#' price.option(op, op.env, n = 10, steps = 1)
 price.option <- function(obj, env, method = env$method, n = env$n, steps = env$steps, ... , all = FALSE) {
     if (is.null(method)) stop("Pricing method not specified")
     res <- get(paste0("price.option.", method))(obj, env, n, steps, ..., all)
@@ -36,7 +37,10 @@ price.option <- function(obj, env, method = env$method, n = env$n, steps = env$s
 #' @examples
 price.option.mc <- function(obj, env, n = env$n, steps = env$steps, all = FALSE) {
     if (is.null(n)) stop("n is not specified")
-    if (is.null(steps)) stop("steps is not specified")
+    if (is.null(steps)) {
+        steps <- 1
+        warning("steps is not specified, evaluated to default value 1")
+    }
     res <- get(paste0(class(obj)[1], ".mc"))(obj, env, n, steps, all)
     res
 }
