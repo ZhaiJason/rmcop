@@ -1,7 +1,5 @@
 # Engine =======================================================================
 
-## [Internal] Generate Trinomial Tree ==========================================
-
 #' Generating Trinomial Tree Matrix
 #'
 #' @param S0 A number representing the current price of the underlying asset.
@@ -22,8 +20,6 @@ Trinomial.tree <- function(S0, u, n) {
     }
     S
 }
-
-## [Internal] Backward Recursive Risk-neutral Valuation for Trinomial Model ====
 
 #' Backward Recursive Risk-neutral Valuation for Trinomial Model
 #'

@@ -162,3 +162,32 @@ option.env <- function(method = "mc", S, r, q = 0, sigma, n = NULL, steps = NULL
     class(env) <- "option.env"
     env
 }
+
+#' Updating `option.env` class object
+#'
+#' @param env
+#' @param method
+#' @param S
+#' @param r
+#' @param q
+#' @param sigma
+#' @param n
+#' @param steps
+#'
+#' @return
+#' @export
+#'
+#' @examples
+update.option.env <- function(env, method = env$method, S = env$S, r = env$r, q = env$q, sigma = env$sigma, n = env$n, steps = env$steps) {
+    env <- list(
+        "method" = method,
+        "S" = S,
+        "r" = r,
+        "q" = q,
+        "sigma" = sigma,
+        "n" = n,
+        "steps" = steps
+    )
+    class(env) <- "option.env"
+    env
+}

@@ -1,7 +1,5 @@
 # Engine =======================================================================
 
-## [Internal] Binomial Tree ====================================================
-
 #' Generating Binomial Tree Matrix
 #'
 #' @param S0 A number representing the current price of the underlying asset.
@@ -22,8 +20,6 @@ Binomial.tree <- function(S0, u, d, n) {
     }
     S
 }
-
-## [Internal] Backward Recursive Risk-neutral Valuation for Binomial Model =====
 
 #' Backward Recursive Risk-neutral Valuation for Binomial Model
 #'
@@ -145,8 +141,3 @@ vanilla.binomial <- function(obj,
 
 # Binomial(20, 8, u = 2, d = 0.5, r = 0.1, n = 3, t = 1, sigma = 0, all = TRUE, type = "call", style = "european")
 
-
-# Redirect to corresponding engines
-exotic.binomial <- function(obj, ...) {
-    NA
-}
