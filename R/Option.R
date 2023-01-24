@@ -7,17 +7,30 @@
 ## Option ======================================================================
 #' Initialise new `option` class object
 #'
-#' @param style The style of the option.
-#' @param ... Arguments required are determined by specified option style.
+#' @param style A string specifying the style of the option of interest. Possible values are `"european"` and `"american"`, corresponding to European options and American options, respectively.
+#' @param option A string specifying the specific family of the option of interest. Supported values are: `"vanilla"` (default, for Vanilla options), `"asian"` (for Asian options), `"barrier"` (for Barrier options), `"binary"` (for Binary/Cash-or-nothing options), and `"lookback"` (for Lookback options).
+#' @param type A string specifying the type of the option of interest. Possible values are either `"call"` or `"put"`, corresponding to call option (right to buy) and pull option (right to sale), respectively.
+#' @param K A number specifying the strike price of the option.
+#' @param t A number specifying the maturity/expiry of the option in years.
+#' @param ... Arguments required by corresponding specified option families.
 #'
-#' @return An object of class `option`.
+#' @return An S3 object with `class` attribute evaluated to `"option"`.
 #' @export
 #'
 #' @examples
+#' # Create an European vanilla option with strike price 20, expiry in 1 year.
 #' vanilla1 <- option("european", "vanilla", "call", K = 20, t = 1)
-#' asian1 <- option("european", "asian", "call", K = 20, t = 1)
+#'
+#' # Create European  average strike Asian option with strike price 20, expiry in 1 year.
+#' asian1 <- option("european", "asian", "call", K = 20, t = 1, is.avg_price = FALSE)
+#'
+#' # Create European knock-out barrier option with strike price 20, barrier price 21, expiry in 1 year.
 #' barrier1 <- option("european", "barrier", "call", K = 20, t = 1, barrier = 21, is.knockout = TRUE)
+#'
+#' # Create European binary option with strike price 20, fixed payout 5, expiry in 1 year.
 #' binary1 <- option("european", "binary", "call", K = 20, t = 1, payout = 5)
+#'
+#' # Create European fixed strike lookback option with strike price 20, expiry in 1 year.
 #' lookback1 <- option("european", "lookback", "call", K = 20, t = 1, is.fixed = TRUE)
 option <- function(style, option = "vanilla", type, K, t, ...) {
 
@@ -40,9 +53,7 @@ option <- function(style, option = "vanilla", type, K, t, ...) {
 ## Vanilla =====================================================================
 #' Initialise vanilla option
 #'
-#' @param obj
-#'
-#' @return
+#' @param obj The specified `"option"` class object which encapsulate some properties of an option of interest.
 #'
 #' @keywords internal
 option.vanilla <- function(obj) {
@@ -53,13 +64,9 @@ option.vanilla <- function(obj) {
 ## Exotic ======================================================================
 #' Initialise exotic option
 #'
-#' @param obj
-#' @param option
-#' @param ...
-#' @param K
-#' @param t
-#'
-#' @return
+#' @param obj The specified `"option"` class object which encapsulate some properties of an option of interest.
+#' @param option A string specifying the specific family of the option of interest. Supported values are: `"vanilla"` (default, for Vanilla options), `"asian"` (for Asian options), `"barrier"` (for Barrier options), `"binary"` (for Binary/Cash-or-nothing options), and `"lookback"` (for Lookback options).
+#' @param ... Arguments required by corresponding specified option families.
 #'
 #' @keywords internal
 option.exotic <- function(obj, option, ...) {
@@ -69,23 +76,23 @@ option.exotic <- function(obj, option, ...) {
 
 #' Initialise Asian option
 #'
-#' @param obj
-#'
-#' @return
+#' @param obj The specified `"option"` class object which encapsulate some properties of an option of interest.
+#' @param is.avg_price A logical value for `"asian" "option"` class objects, specifying whether the option is an "average price Asian option" or "average strike Asian option". The default value for this argument is `TRUE`, indicating the option being an "average price Asian option".
 #'
 #' @keywords internal
-option.exotic.asian <- function(obj) {
+option.exotic.asian <- function(obj, is.avg_price = TRUE) {
+    obj <- c(
+        obj,
+        "is.avg_price" = is.avg_price
+    )
     class(obj) <- c("asian", "option")
     obj
 }
 
 #' Initialise barrier option
-#'
-#' @param obj
-#' @param barrier
-#' @param is.knockout
-#'
-#' @return
+#' @param obj The specified `"option"` class object which encapsulate some properties of an option of interest.
+#' @param barrier A number for `"barrier" "option"` class objects, specifying the barrier price of the barrier option.
+#' @param is.knockout A logical value for `"barrier" "option"` class objects, specifying whether the option is an "knock-out barrier option" (`is.knockout = TRUE`) or "knock-in barrier option" (`is.knockout = FALSE`).
 #'
 #' @keywords internal
 option.exotic.barrier <- function(obj, barrier, is.knockout = TRUE) {
@@ -100,10 +107,8 @@ option.exotic.barrier <- function(obj, barrier, is.knockout = TRUE) {
 
 #' Initialise binary option
 #'
-#' @param obj
-#' @param payout
-#'
-#' @return
+#' @param obj The specified `"option"` class object which encapsulate some properties of an option of interest.
+#' @param payout A number for `"binary" "option"` class objects, specifying the payout of a binary option.
 #'
 #' @keywords internal
 option.exotic.binary <- function(obj, payout) {
@@ -117,10 +122,8 @@ option.exotic.binary <- function(obj, payout) {
 
 #' Initialise lookback option
 #'
-#' @param obj
-#' @param is.fixed A boolean specifying if the lookback option is "fixed" or "floating" lookback option.
-#'
-#' @return
+#' @param obj The specified `"option"` class object which encapsulate some properties of an option of interest.
+#' @param is.fixed A logical value for `"lookback" "option"` class objects. specifying whether the option is an "fixed strike look-back option" (`is.fixed = TRUE`) or "floating strike look-back option" (`is.fixed = FALSE`).
 #'
 #' @keywords internal
 option.exotic.lookback <- function(obj, is.fixed = TRUE) {
@@ -134,20 +137,23 @@ option.exotic.lookback <- function(obj, is.fixed = TRUE) {
 
 # Creating new option environment ==============================================
 
-#' Initialise new `option.env` class object
+#' Initialise new `env` class object
 #'
-#' @param method A character specifying the method that will be used for option pricing. The default value for this argument is `"mc"`, which represents to use Monte Carlo approach.
+#' @param method A string specifying the method used to price the option. Supported values are `"mc"` (Monte Carlo Method), `"bs"` (for Black-Scholes formula), `"binomial"` (Binomial Lattice Tree), and `"trinomial"` (Trinomial Lattice Tree).
 #' @param S A number specifying the current price of the underlying asset.
-#' @param r A number specifying the (assumed fixed) continuously compounded annual interest rate.
-#' @param q A number specifying the (assumed fixed) continuously compounded annual dividend yield rate.
-#' @param sigma A number specifying the (assumed fixed) annual volatility measure. Notice when pricing with `mc` method, it can be also evaluated to a corresponding `n` by `m` matrix, which allows variation of volatility through the option(s)'s life; this should, however, be exercised with caution, as this is not the intended application of the algorithm.
-#' @param ... Other arguments required by specified `method`.
-#' @param all A boolean specifying whether the pricing function should return only the result price (if `FALSE`) or other (maybe useful) data during computation (if `TRUE`). The default value for this argument is `FALSE`.
+#' @param r A number specifying the (fixed) annual interest rate.
+#' @param q A number specifying the (fixed) annual dividend yield rate of the option.
+#' @param sigma A number specifying the annual volatility measure.
+#' @param n A number speciying the number of simulations to make (for `method = "mc"`), or the number of time steps the life of the option will be broken into (for `method = "binomial"` and `method = "trinomial"`).
+#' @param steps A number specifying the number of steps each asset price trajectory will contain, used only for `method = "mc"`.
 #'
-#' @return
+#' @return An S3 object with `class` attribute evaluated to `"env"`.
 #' @export
 #'
 #' @examples
+#' # Create an environment with current price 20, annual interest rate 2%,
+#' # annual dividend yield rate 1%, annual volatility measure 0.05, and number
+#' # of simulations set to 100
 #' env1 <- option.env(S = 20, r = 0.02, q = 0.01, sigma = 0.05, n = 100)
 option.env <- function(method = "mc", S, r, q = 0, sigma, n = NULL, steps = NULL) {
     env <- list(
@@ -159,26 +165,33 @@ option.env <- function(method = "mc", S, r, q = 0, sigma, n = NULL, steps = NULL
         "n" = n,
         "steps" = steps
     )
-    class(env) <- "option.env"
+    class(env) <- "env"
     env
 }
 
 #' Updating `option.env` class object
 #'
-#' @param env
-#' @param method
-#' @param S
-#' @param r
-#' @param q
-#' @param sigma
-#' @param n
-#' @param steps
+#' @param env The specified `"env"` class object which encapsulate some market variables required by corresponding pricing methods.
+#' @param method A string specifying the method used to price the option. Supported values are `"mc"` (Monte Carlo Method), `"bs"` (for Black-Scholes formula), `"binomial"` (Binomial Lattice Tree), and `"trinomial"` (Trinomial Lattice Tree).
+#' @param S A number specifying the current price of the underlying asset.
+#' @param r A number specifying the (fixed) annual interest rate.
+#' @param q A number specifying the (fixed) annual dividend yield rate of the option.
+#' @param sigma A number specifying the annual volatility measure.
+#' @param n A number speciying the number of simulations to make (for `method = "mc"`), or the number of time steps the life of the option will be broken into (for `method = "binomial"` and `method = "trinomial"`).
+#' @param steps A number specifying the number of steps each asset price trajectory will contain, used only for `method = "mc"`.
 #'
-#' @return
+#' @return An S3 object with `class` attribute evaluated to `"env"`.
 #' @export
 #'
 #' @examples
-update.option.env <- function(env, method = env$method, S = env$S, r = env$r, q = env$q, sigma = env$sigma, n = env$n, steps = env$steps) {
+#' # Create an environment with current price 20, annual interest rate 2%,
+#' # annual dividend yield rate 1%, annual volatility measure 0.05, and number
+#' # of simulations set to 100
+#' env1 <- option.env(S = 20, r = 0.02, q = 0.01, sigma = 0.05, n = 100)
+#'
+#' # Update env1's current price S to 25
+#' env1 <- update.env(env1, S = 25)
+update.env <- function(env, method = env$method, S = env$S, r = env$r, q = env$q, sigma = env$sigma, n = env$n, steps = env$steps) {
     env <- list(
         "method" = method,
         "S" = S,
@@ -188,6 +201,6 @@ update.option.env <- function(env, method = env$method, S = env$S, r = env$r, q 
         "n" = n,
         "steps" = steps
     )
-    class(env) <- "option.env"
+    class(env) <- "env"
     env
 }

@@ -3,7 +3,7 @@
 #' Generating Trinomial Tree Matrix
 #'
 #' @param S0 A number representing the current price of the underlying asset.
-#' @param u A number representing the ratio of an up jump in the asset value. Notice here a ratio for down jump is not specified, this is because under the Trinomial model we assume that d = 1/u.
+#' @param u A number representing the ratio of an upward price movement. Notice here a ratio for down jump is not specified, this is because under the Trinomial model we assume that d = 1/u.
 #' @param n An integer representing the number of time steps into which the interval of length t is divided.
 #'
 #' @return A matrix representing the Trinomial lattice tree.
@@ -23,20 +23,19 @@ Trinomial.tree <- function(S0, u, n) {
 
 #' Backward Recursive Risk-neutral Valuation for Trinomial Model
 #'
-#' @param p A number representing the risk-neutral probability.
-#'
 #' @param fn A numeric vector containing all possible stock prices at the final step/state of the binomial tree.
-#' @param p1 A number representing the risk-neutral probability of an up jump of the asset price.
-#' @param p2 A number representing the risk-neutral probability of an horizontal jump of the asset price.
-#' @param p3 A number representing the risk-neutral probability of an down jump of the asset price.
+#' @param p1 A number representing the risk-neutral probability of an upward movement of the asset price.
+#' @param p2 A number representing the risk-neutral probability of an horizontal movement of the asset price.
+#' @param p3 A number representing the risk-neutral probability of an downward movement of the asset price.
 #' @param r A number representing the (assumed fixed) continuously compounded yearly interest rate.
+#' @param n A number speciying the number of simulations to make (for `method = "mc"`), or the number of time steps the life of the option will be broken into (for `method = "binomial"` and `method = "trinomial"`).
 #' @param dt A number representing the length in time of each step.
 #' @param K A number representing the exercise price of option, needed only when calculating an american option.
 #' @param S A number representing the current price of option, needed only when calculating an american option.
 #' @param type A character evaluating to either `"call"` or `"put"`, representing the type of the option; the default value is set to be `"call"`.
 #' @param style A character evaluating to either `"european"` or `"american"`, representing the style of the option; the default value is set to be `"american"`.
 #'
-#' @return A number representing the result option price.
+#' @return A number representing the result options price.
 #'
 #' @keywords internal
 Trinomial.rnv <- function(fn, p1, p2, p3, r, n, dt, K = NULL, S = NULL,
@@ -78,31 +77,24 @@ Trinomial.rnv <- function(fn, p1, p2, p3, r, n, dt, K = NULL, S = NULL,
 
 # Model ========================================================================
 
-#' Phelim Boyle Trinomial Lattice Model
+#' Binomial model for pricing vanilla options
 #'
-#' @param K A number representing the exercise price of option.
-#' @param S A number representing the current price of option, this is also the asset value after a horizontal jump.
-#' @param u A number representing the ratio of an up jump in the asset value. Notice here a ratio for down jump is not specified, this is because under the Trinomial model we assume that d = 1/u.
-#' @param r A number representing the continuously compounded yearly interest rate.
-#' @param t A number representing the time to option maturity (in years).
-#' @param n An integer representing the number of time steps into which the interval of length t is divided.
-#' @param sigma A number representing the volatility (in standard deviation) of the rate of return on the underlying asset (yearly).
-#' @param type A character evaluating to either `"call"` or `"put"`, representing the type of the option; the default value is set to be `"call"`.
-#' @param style A character evaluating to either `"european"` or `"american"`, representing the style of the option; the default value is set to be `"american"`.
-#' @param all A logical evaluating to `TRUE` or `FALSE` indicating whether the output should contain all option price, risk-neutral probability, and stock price tree, or option price only; the default value is set to be `FALSE`.
-#' @param plot A logical evaluating to `TRUE` or `FALSE` indicating whether the binomial tree should be plotted; the default value is set to be `FALSE`.
+#' @param obj The specified `"option"` class object which encapsulate some properties of an option of interest.
+#' @param env The specified `"env"` class object which encapsulate some market variables required by corresponding pricing methods.
+#' @param n A number speciying the number of simulations to make (for `method = "mc"`), or the number of time steps the life of the option will be broken into (for `method = "binomial"` and `method = "trinomial"`).
+#' @param u A number representing the ratio of an upward price movement. Notice here a ratio for down jump is not specified, this is because under the Trinomial model we assume that d = 1/u.
+#' @param all A logical value specifying whether the pricing function should return only the result price (`all = FALSE`) or other data during computation (`all = TRUE`). The default value for this argument is `FALSE`.
 #'
-#' @return If `all = FALSE`, return only a number representing the result option price, where as `all = TRUE` return a list containing the result options price, risk-neutral probability, and the stock price tree (matrix). If `plot = TRUE`, the function will also produce a plot of the Binomial tree.
-#' @export
-#'
-#' @examples Trinomial(50, 8, 2, 0.05, 2, 3, type = "put", all = TRUE)
-Trinomial <- function(K, S, u, r, t, n, sigma = 0,
-                      type = "call",
-                      style = "european",
-                      all = FALSE,
-                      plot = FALSE) {
+#' @keywords internal
+vanilla.trinomial <- function(obj, env, n, u, all = FALSE) {
 
-    # Restrict u != 1
+    style = obj$style
+    type = obj$type
+    K = obj$K
+    t = obj$t
+    S = env$S
+    r = env$r
+    sigma = env$sigma
 
     dt <- T/n
     M <- exp(r * dt)

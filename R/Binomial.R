@@ -75,35 +75,25 @@ Binomial.rnv <- function(fn, p, q, r, n, dt, K = NULL, S = NULL,
 
 # Model ========================================================================
 
-#' Binomial model engine for vanilla options
+#' Binomial model for pricing vanilla options
 #'
-#' @param obj
-#' @param S
-#' @param u
-#' @param d
-#' @param r
-#' @param n
-#' @param t
-#' @param sigma
-#' @param all
+#' @param obj The specified `"option"` class object which encapsulate some properties of an option of interest.
+#' @param env The specified `"env"` class object which encapsulate some market variables required by corresponding pricing methods.
+#' @param n A number speciying the number of simulations to make (for `method = "mc"`), or the number of time steps the life of the option will be broken into (for `method = "binomial"` and `method = "trinomial"`).
+#' @param u A number representing the ratio of an upward price movement.
+#' @param d A number representing the ratio of an downward price movement.
+#' @param all A logical value specifying whether the pricing function should return only the result price (`all = FALSE`) or other data during computation (`all = TRUE`). The default value for this argument is `FALSE`.
 #'
-#' @return
-#' @export
-#'
-#' @examples
-vanilla.binomial <- function(obj,
-                             env = NA,
-                             S = obj$S,
-                             u = obj$u,
-                             d = obj$d,
-                             r = obj$r,
-                             n = obj$n,
-                             t = obj$t,
-                             sigma = obj$sigma,
-                             all = FALSE) {
-    style <- obj$style
-    type <- obj$type
-    K <- obj$K
+#' @keywords internal
+vanilla.binomial <- function(obj, env, n, u, d, all = FALSE) {
+
+    style = obj$style
+    type = obj$type
+    K = obj$K
+    t = obj$t
+    S = env$S
+    r = env$r
+
     dt <- t / n # Compute delta t
     p <- (exp(r * dt) - d) / (u - d) # Compute riskless probability for an upward price movement
     q <- 1 - p # Compute riskless probability for a downward price movement

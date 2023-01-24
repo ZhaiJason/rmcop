@@ -14,7 +14,7 @@ Binomial.rnv(
   K = NULL,
   S = NULL,
   type = "call",
-  style = "European"
+  style = "european"
 )
 }
 \arguments{
@@ -30,13 +30,13 @@ Binomial.rnv(
 
 \item{dt}{A number representing the length in time of each step.}
 
-\item{K}{A number representing the exercise price of option, needed only when calculating an American option.}
+\item{K}{A number representing the exercise price of option, needed only when calculating an american option.}
 
-\item{S}{A number representing the current price of option, needed only when calculating an American option.}
+\item{S}{A number representing the current price of option, needed only when calculating an american option.}
 
 \item{type}{A character evaluating to either \code{"call"} or \code{"put"}, representing the type of the option; the default value is set to be \code{"call"}.}
 
-\item{style}{A character evaluating to either \code{"European"} or \code{"American"}, representing the style of the option; the default value is set to be \code{"American"}.}
+\item{style}{A character evaluating to either \code{"european"} or \code{"american"}, representing the style of the option; the default value is set to be \code{"american"}.}
 }
 \value{
 A number representing the result options price.

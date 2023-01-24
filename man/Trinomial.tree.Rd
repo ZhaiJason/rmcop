@@ -9,7 +9,7 @@ Trinomial.tree(S0, u, n)
 \arguments{
 \item{S0}{A number representing the current price of the underlying asset.}
 
-\item{u}{A number representing the ratio of an up jump in the asset value. Notice here a ratio for down jump is not specified, this is because under the Trinomial model we assume that d = 1/u.}
+\item{u}{A number representing the ratio of an upward price movement. Notice here a ratio for down jump is not specified, this is because under the Trinomial model we assume that d = 1/u.}
 
 \item{n}{An integer representing the number of time steps into which the interval of length t is divided.}
 }

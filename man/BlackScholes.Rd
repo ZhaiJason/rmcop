@@ -27,6 +27,4 @@ A number representing the current price of the option.
 \description{
 Black-Scholes Model for Option Pricing
 }
-\examples{
-BlackScholes(50, 55, 0.5, 0.1, 0.03, 0.2, type = "call") # 1.587868
-}
+\keyword{internal}

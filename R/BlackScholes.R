@@ -31,9 +31,8 @@ BlackScholes.d1 <- function(S, K, t, r, q, sigma) {
 #' @param type A character evaluating to either `"call"` or `"put"`, representing the type of the option; the default value is set to be `"call"`.
 #'
 #' @return A number representing the current price of the option.
-#' @export
 #'
-#' @examples BlackScholes(50, 55, 0.5, 0.1, 0.03, 0.2, type = "call") # 1.587868
+#' @keywords internal
 BlackScholes <- function(S, K, t, r, q, sigma, type = "call") {
     d1 <- BlackScholes.d1(S, K, t, r, q, sigma)
     d2 <- d1 - sigma * sqrt(t)
@@ -45,4 +44,8 @@ BlackScholes <- function(S, K, t, r, q, sigma, type = "call") {
     } else {
         stop("Invalid option type. `type` must be specified to either 'call' or 'put'.")
     }
+}
+
+vanilla.bs <- function(obj, env, all) {
+    NA
 }

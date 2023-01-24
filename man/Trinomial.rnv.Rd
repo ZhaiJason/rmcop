@@ -15,34 +15,34 @@ Trinomial.rnv(
   K = NULL,
   S = NULL,
   type = "call",
-  style = "European"
+  style = "european"
 )
 }
 \arguments{
 \item{fn}{A numeric vector containing all possible stock prices at the final step/state of the binomial tree.}
 
-\item{p1}{A number representing the risk-neutral probability of an up jump of the asset price.}
+\item{p1}{A number representing the risk-neutral probability of an upward movement of the asset price.}
 
-\item{p2}{A number representing the risk-neutral probability of an horizontal jump of the asset price.}
+\item{p2}{A number representing the risk-neutral probability of an horizontal movement of the asset price.}
 
-\item{p3}{A number representing the risk-neutral probability of an down jump of the asset price.}
+\item{p3}{A number representing the risk-neutral probability of an downward movement of the asset price.}
 
-\item{r}{A number representing the continuously compounded yearly interest rate.}
+\item{r}{A number representing the (assumed fixed) continuously compounded yearly interest rate.}
+
+\item{n}{A number speciying the number of simulations to make (for \code{method = "mc"}), or the number of time steps the life of the option will be broken into (for \code{method = "binomial"} and \code{method = "trinomial"}).}
 
 \item{dt}{A number representing the length in time of each step.}
 
-\item{K}{A number representing the exercise price of option, needed only when calculating an American option.}
+\item{K}{A number representing the exercise price of option, needed only when calculating an american option.}
 
-\item{S}{A number representing the current price of option, needed only when calculating an American option.}
+\item{S}{A number representing the current price of option, needed only when calculating an american option.}
 
 \item{type}{A character evaluating to either \code{"call"} or \code{"put"}, representing the type of the option; the default value is set to be \code{"call"}.}
 
-\item{style}{A character evaluating to either \code{"European"} or \code{"American"}, representing the style of the option; the default value is set to be \code{"American"}.}
-
-\item{p}{A number representing the risk-neutral probability.}
+\item{style}{A character evaluating to either \code{"european"} or \code{"american"}, representing the style of the option; the default value is set to be \code{"american"}.}
 }
 \value{
-A number representing the result option price.
+A number representing the result options price.
 }
 \description{
 Backward Recursive Risk-neutral Valuation for Trinomial Model

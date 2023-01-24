@@ -2,19 +2,18 @@
 
 #' Engine for Monte Carlo Simulation on Asset Price Trajectory
 #'
+#' @param type A string specifying the type of the option of interest. Possible values are either `"call"` or `"put"`, corresponding to call option (right to buy) and pull option (right to sale), respectively.
+#' @param K A number specifying the strike price of the option.
+#' @param t A number specifying the maturity/expiry of the option in years.
+#' @param S A number specifying the current price of the underlying asset.
+#' @param r A number specifying the (fixed) annual interest rate.
+#' @param q A number specifying the (fixed) annual dividend yield rate of the option.
+#' @param sigma A number specifying the annual volatility measure.
+#' @param n A number speciying the number of simulations to make (for `method = "mc"`), or the number of time steps the life of the option will be broken into (for `method = "binomial"` and `method = "trinomial"`).
+#' @param steps A number specifying the number of steps each asset price trajectory will contain, used only for `method = "mc"`.
+#'
 #' @importFrom stats rnorm
-#'
-#' @param type
-#' @param K
-#' @param S
-#' @param r
-#' @param q
-#' @param t
-#' @param sigma
-#' @param n
-#' @param m
-#'
-#' @return
+#' @return A matrix recording the simulated price trajectories.
 #'
 #' @keywords internal
 mc.engine <- function(type, K, t, S, r, q, sigma, n, steps) {
@@ -46,11 +45,11 @@ mc.engine <- function(type, K, t, S, r, q, sigma, n, steps) {
 
 #' Compute Monte Carlo Model's Standard Error
 #'
-#' @param C_i
-#' @param C.estimate
-#' @param n
+#' @param C_i A matrix recording the resulted option pay-offs from Monte Carlo simulations.
+#' @param C.estimate A number recording the resulted estimate of the price of the option.
+#' @param n A number speciying the number of simulations to make (for `method = "mc"`), or the number of time steps the life of the option will be broken into (for `method = "binomial"` and `method = "trinomial"`).
 #'
-#' @return
+#' @return A number recording the standard error of the corresponding Monte Carlo estimate of the option price.
 #'
 #' @keywords internal
 mc.SE <- function(C_i, C.estimate, n) {
@@ -63,13 +62,11 @@ mc.SE <- function(C_i, C.estimate, n) {
 
 #' Pricing vanilla option using Monte Carlo method
 #'
-#' @param obj The predefined `option` class object.
-#' @param env The predefined `option.env` class object, or a list specifying method's corresponding arguments.
-#' @param n An integer specifying the number of Monte Carlo replications of asset price to take.
-#' @param m An integer specifying the number of time steps the option(s)'s life will be divided into.
-#' @param all A boolean specifying whether the pricing function should return only the result price (if `FALSE`) or other (maybe useful) data during computation (if `TRUE`). The default value for this argument is `FALSE`.
-#'
-#' @return
+#' @param obj The specified `"option"` class object which encapsulate some properties of an option of interest.
+#' @param env The specified `"env"` class object which encapsulate some market variables required by corresponding pricing methods.
+#' @param n A number speciying the number of simulations to make (for `method = "mc"`), or the number of time steps the life of the option will be broken into (for `method = "binomial"` and `method = "trinomial"`).
+#' @param steps A number specifying the number of steps each asset price trajectory will contain, used only for `method = "mc"`.
+#' @param all A logical value specifying whether the pricing function should return only the result price (`all = FALSE`) or other data during computation (`all = TRUE`). The default value for this argument is `FALSE`.
 #'
 #' @keywords internal
 vanilla.mc <- function(obj, env, n, steps, all = FALSE) {
@@ -126,13 +123,11 @@ vanilla.mc <- function(obj, env, n, steps, all = FALSE) {
 
 #' Pricing Asian option using Monte Carlo method
 #'
-#' @param obj
-#' @param env
-#' @param n
-#' @param steps
-#' @param all
-#'
-#' @return
+#' @param obj The specified `"option"` class object which encapsulate some properties of an option of interest.
+#' @param env The specified `"env"` class object which encapsulate some market variables required by corresponding pricing methods.
+#' @param n A number speciying the number of simulations to make (for `method = "mc"`), or the number of time steps the life of the option will be broken into (for `method = "binomial"` and `method = "trinomial"`).
+#' @param steps A number specifying the number of steps each asset price trajectory will contain, used only for `method = "mc"`.
+#' @param all A logical value specifying whether the pricing function should return only the result price (`all = FALSE`) or other data during computation (`all = TRUE`). The default value for this argument is `FALSE`.
 #'
 #' @keywords internal
 asian.mc <- function(obj, env, n, steps, all = FALSE) {
@@ -144,6 +139,7 @@ asian.mc <- function(obj, env, n, steps, all = FALSE) {
     type <- obj$type
     K <- obj$K
     t <- obj$t
+    is.avg_price <- obj$is.avg_price
     S <- env$S
     r <- env$r
     q <- env$q
@@ -160,11 +156,20 @@ asian.mc <- function(obj, env, n, steps, all = FALSE) {
     S.mean <- apply(S_i, 1, mean)
 
     # Compute corresponding discounted price at current time
-    if (type == "call") {
-        C_i <- exp(-r * t) * pmax(S.mean - K, 0)
-    } else if (type == "put") {
-        C_i <- exp(-r * t) * pmax(K - S.mean, 0)
+    if (is.avg_price) { # Compute payoff for average price Asian option
+        if (type == "call") {
+            C_i <- exp(-r * t) * pmax(S.mean - K, 0)
+        } else if (type == "put") {
+            C_i <- exp(-r * t) * pmax(K - S.mean, 0)
+        }
+    } else { # Compute payoff for average strike Asian option
+        if (type == "call") {
+            C_i <- exp(-r * t) * pmax(S_i[ , steps] - S.mean, 0)
+        } else if (type == "put") {
+            C_i <- exp(-r * t) * pmax(S.mean - S_i[ , steps], 0)
+        }
     }
+
 
     # Obtain the estimate of option price by taking average of C_i
     C.estimate <- mean(C_i)
@@ -190,16 +195,13 @@ asian.mc <- function(obj, env, n, steps, all = FALSE) {
 
 #' Pricing Barrier option using Monte Carlo method
 #'
-#' @param obj
-#' @param env
-#' @param n
-#' @param steps
-#' @param all
+#' @param obj The specified `"option"` class object which encapsulate some properties of an option of interest.
+#' @param env The specified `"env"` class object which encapsulate some market variables required by corresponding pricing methods.
+#' @param n A number speciying the number of simulations to make (for `method = "mc"`), or the number of time steps the life of the option will be broken into (for `method = "binomial"` and `method = "trinomial"`).
+#' @param steps A number specifying the number of steps each asset price trajectory will contain, used only for `method = "mc"`.
+#' @param all A logical value specifying whether the pricing function should return only the result price (`all = FALSE`) or other data during computation (`all = TRUE`). The default value for this argument is `FALSE`.
 #'
-#' @return
-#' @export
-#'
-#' @examples
+#' @keywords internal
 barrier.mc <- function(obj, env, n, steps, all = FALSE) {
     # Check object integrity, CAN BE OMITTED
     check.args(obj, env, option = "barrier")
@@ -266,16 +268,13 @@ barrier.mc <- function(obj, env, n, steps, all = FALSE) {
 
 #' Pricing Barrier option using Monte Carlo method
 #'
-#' @param obj
-#' @param env
-#' @param n
-#' @param steps
-#' @param all
+#' @param obj The specified `"option"` class object which encapsulate some properties of an option of interest.
+#' @param env The specified `"env"` class object which encapsulate some market variables required by corresponding pricing methods.
+#' @param n A number speciying the number of simulations to make (for `method = "mc"`), or the number of time steps the life of the option will be broken into (for `method = "binomial"` and `method = "trinomial"`).
+#' @param steps A number specifying the number of steps each asset price trajectory will contain, used only for `method = "mc"`.
+#' @param all A logical value specifying whether the pricing function should return only the result price (`all = FALSE`) or other data during computation (`all = TRUE`). The default value for this argument is `FALSE`.
 #'
-#' @return
-#' @export
-#'
-#' @examples
+#' @keywords internal
 binary.mc <- function(obj, env, n, steps, all = FALSE) {
 
     # Check object integrity, CAN BE OMITTED
@@ -330,18 +329,15 @@ binary.mc <- function(obj, env, n, steps, all = FALSE) {
     }
 }
 
-#' Title
+#' Pricing Lookback option using Monte Carlo method
 #'
-#' @param obj
-#' @param env
-#' @param n
-#' @param steps
-#' @param all
+#' @param obj The specified `"option"` class object which encapsulate some properties of an option of interest.
+#' @param env The specified `"env"` class object which encapsulate some market variables required by corresponding pricing methods.
+#' @param n A number speciying the number of simulations to make (for `method = "mc"`), or the number of time steps the life of the option will be broken into (for `method = "binomial"` and `method = "trinomial"`).
+#' @param steps A number specifying the number of steps each asset price trajectory will contain, used only for `method = "mc"`.
+#' @param all A logical value specifying whether the pricing function should return only the result price (`all = FALSE`) or other data during computation (`all = TRUE`). The default value for this argument is `FALSE`.
 #'
-#' @return
-#' @export
-#'
-#' @examples
+#' @keywords internal
 lookback.mc <- function(obj, env, n, steps, all = FALSE) {
     # Check object integrity, CAN BE OMITTED
     check.args(obj, env, option = "lookback")

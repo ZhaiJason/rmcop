@@ -1,21 +1,16 @@
 # Check pricing function input argument integrity ==============================
 
-#' Title
+#' Object integrity check for price.option functions
 #'
-#' @param obj
-#' @param env
+#' @param obj The specified `"option"` class object which encapsulate some properties of an option of interest.
+#' @param env The specified `"env"` class object which encapsulate some market variables required by corresponding pricing methods.
 #'
-#' @return
-#' @export
-#'
-#' @examples
+#' @keywords internal
 check.args <- function(obj, env, option) {
-    if (any(class(obj) != c(option, "option"))) stop("Invalid obj class")
-    if (class(env) != "option.env") stop("Invalid env class")
+    if (!(inherits(obj, "option"))) stop("Invalid obj class")
+    if (!(inherits(env, "env"))) stop("Invalid env class")
 }
 
 # Format Monte Carlo Output ====================================================
 
-# print.res <- function(res) {
-#     print("test print res")
-# }
+# Not yet implemented
