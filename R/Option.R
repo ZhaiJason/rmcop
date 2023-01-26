@@ -168,39 +168,3 @@ option.env <- function(method = "mc", S, r, q = 0, sigma, n = NULL, steps = NULL
     class(env) <- "env"
     env
 }
-
-#' Updating `option.env` class object
-#'
-#' @param env The specified `"env"` class object which encapsulate some market variables required by corresponding pricing methods.
-#' @param method A string specifying the method used to price the option. Supported values are `"mc"` (Monte Carlo Method), `"bs"` (for Black-Scholes formula), `"binomial"` (Binomial Lattice Tree), and `"trinomial"` (Trinomial Lattice Tree).
-#' @param S A number specifying the current price of the underlying asset.
-#' @param r A number specifying the (fixed) annual interest rate.
-#' @param q A number specifying the (fixed) annual dividend yield rate of the option.
-#' @param sigma A number specifying the annual volatility measure.
-#' @param n A number speciying the number of simulations to make (for `method = "mc"`), or the number of time steps the life of the option will be broken into (for `method = "binomial"` and `method = "trinomial"`).
-#' @param steps A number specifying the number of steps each asset price trajectory will contain, used only for `method = "mc"`.
-#'
-#' @return An S3 object with `class` attribute evaluated to `"env"`.
-#' @export
-#'
-#' @examples
-#' # Create an environment with current price 20, annual interest rate 2%,
-#' # annual dividend yield rate 1%, annual volatility measure 0.05, and number
-#' # of simulations set to 100
-#' env1 <- option.env(S = 20, r = 0.02, q = 0.01, sigma = 0.05, n = 100)
-#'
-#' # Update env1's current price S to 25
-#' env1 <- update.env(env1, S = 25)
-update.env <- function(env, method = env$method, S = env$S, r = env$r, q = env$q, sigma = env$sigma, n = env$n, steps = env$steps) {
-    env <- list(
-        "method" = method,
-        "S" = S,
-        "r" = r,
-        "q" = q,
-        "sigma" = sigma,
-        "n" = n,
-        "steps" = steps
-    )
-    class(env) <- "env"
-    env
-}

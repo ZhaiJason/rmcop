@@ -29,6 +29,6 @@ Pricing \code{option} Class Object
 op <- option("european", "vanilla", "call", 20, 0.75)
 op.env <- option.env(S = 20, r = 0.03, q = 0.01, sigma = 0.05)
 price.option(op, op.env, n = 10, steps = 1, all = TRUE)
-price.option(op, env1, n = 10, u = 1.2, d = 0.8, method = "binomial", all = TRUE)
-price.option(op, env1, n = 10, u = 1.2, method = "trinomial", all = TRUE)
+price.option(op, op.env, n = 10, u = 1.2, d = 0.8, method = "binomial", all = TRUE)
+price.option(op, op.env, n = 10, u = 1.2, method = "trinomial", all = TRUE)
 }
