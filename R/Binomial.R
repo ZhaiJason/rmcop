@@ -126,8 +126,3 @@ vanilla.binomial <- function(obj, env, n, u, d, all = FALSE) {
         price
     }
 }
-
-
-
-# Binomial(20, 8, u = 2, d = 0.5, r = 0.1, n = 3, t = 1, sigma = 0, all = TRUE, type = "call", style = "european")
-
