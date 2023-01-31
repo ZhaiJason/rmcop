@@ -11,6 +11,21 @@ check.args <- function(obj, env, option) {
     if (!(inherits(env, "env"))) stop("Invalid env class")
 }
 
-# Format Monte Carlo Output ====================================================
+# Monte Carlo Price Trajectory Plot ============================================
 
-# Not yet implemented
+#' Monte Carlo Price Trajectory Plot
+#'
+#' @param S_i Price trajectory matrix.
+#' @param ... Other parameters used for plotting
+#'
+#' @importFrom graphics matplot
+#'
+#' @keywords internal
+mc.plot <- function(S_i, ...) {
+    if (prod(dim(S_i)) > 10000) {
+        warning("Trajectory points with number greater than 10000, plotting may take time and the result may look fairly ugly")
+    }
+    matplot(t(S_i), type = "l",
+            main = "Simulated Price Trajectories", xlab = "time", ylab = "price",
+            ...)
+}

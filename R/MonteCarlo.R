@@ -40,7 +40,7 @@ mc.engine <- function(type, K, t, S, r, q, sigma, n, steps) {
         S_i <- S_i * exp(-q * t) # Adjust the asset price for dividends
 
     }
-    S_i
+    S_i <- cbind(S, S_i) # Add column of current price
 }
 
 #' Compute Monte Carlo Model's Standard Error
@@ -67,9 +67,11 @@ mc.SE <- function(C_i, C.estimate, n) {
 #' @param n A number speciying the number of simulations to make (for `method = "mc"`), or the number of time steps the life of the option will be broken into (for `method = "binomial"` and `method = "trinomial"`).
 #' @param steps A number specifying the number of steps each asset price trajectory will contain, used only for `method = "mc"`.
 #' @param all A logical value specifying whether the pricing function should return only the result price (`all = FALSE`) or other data during computation (`all = TRUE`). The default value for this argument is `FALSE`.
+#' @param plot A logical value specifying whether the simulated price trajectories should be plotted. The default value for this argument is `FALSE`.
+#' @param ... Graphical arguments used for plotting.
 #'
 #' @keywords internal
-vanilla.mc <- function(obj, env, n, steps, all = FALSE) {
+vanilla.mc <- function(obj, env, n, steps, all = FALSE, plot = FALSE, ...) {
 
     # Check object integrity, CAN BE OMITTED
     check.args(obj, env, option = "vanilla")
@@ -100,10 +102,13 @@ vanilla.mc <- function(obj, env, n, steps, all = FALSE) {
     }
 
     # Obtain the estimate of option price by taking average of C_i
-    C.estimate <- mean(C_i)
+    C.estimate <- mean(C_i, ...)
 
     # Compute standard error of the estimate
     SE <- mc.SE(C_i, C.estimate, n)
+
+    # Plot function
+    if (plot) {mc.plot(S_i, ...)}
 
     # Return result
     if (all) {
@@ -128,9 +133,11 @@ vanilla.mc <- function(obj, env, n, steps, all = FALSE) {
 #' @param n A number speciying the number of simulations to make (for `method = "mc"`), or the number of time steps the life of the option will be broken into (for `method = "binomial"` and `method = "trinomial"`).
 #' @param steps A number specifying the number of steps each asset price trajectory will contain, used only for `method = "mc"`.
 #' @param all A logical value specifying whether the pricing function should return only the result price (`all = FALSE`) or other data during computation (`all = TRUE`). The default value for this argument is `FALSE`.
+#' @param plot A logical value specifying whether the simulated price trajectories should be plotted. The default value for this argument is `FALSE`.
+#' @param ... Graphical arguments used for plotting.
 #'
 #' @keywords internal
-asian.mc <- function(obj, env, n, steps, all = FALSE) {
+asian.mc <- function(obj, env, n, steps, all = FALSE, plot = FALSE, ...) {
     # Check object integrity, CAN BE OMITTED
     check.args(obj, env, option = "asian")
 
@@ -200,9 +207,11 @@ asian.mc <- function(obj, env, n, steps, all = FALSE) {
 #' @param n A number speciying the number of simulations to make (for `method = "mc"`), or the number of time steps the life of the option will be broken into (for `method = "binomial"` and `method = "trinomial"`).
 #' @param steps A number specifying the number of steps each asset price trajectory will contain, used only for `method = "mc"`.
 #' @param all A logical value specifying whether the pricing function should return only the result price (`all = FALSE`) or other data during computation (`all = TRUE`). The default value for this argument is `FALSE`.
+#' @param plot A logical value specifying whether the simulated price trajectories should be plotted. The default value for this argument is `FALSE`.
+#' @param ... Graphical arguments used for plotting.
 #'
 #' @keywords internal
-barrier.mc <- function(obj, env, n, steps, all = FALSE) {
+barrier.mc <- function(obj, env, n, steps, all = FALSE, plot = FALSE, ...) {
     # Check object integrity, CAN BE OMITTED
     check.args(obj, env, option = "barrier")
 
@@ -273,9 +282,11 @@ barrier.mc <- function(obj, env, n, steps, all = FALSE) {
 #' @param n A number speciying the number of simulations to make (for `method = "mc"`), or the number of time steps the life of the option will be broken into (for `method = "binomial"` and `method = "trinomial"`).
 #' @param steps A number specifying the number of steps each asset price trajectory will contain, used only for `method = "mc"`.
 #' @param all A logical value specifying whether the pricing function should return only the result price (`all = FALSE`) or other data during computation (`all = TRUE`). The default value for this argument is `FALSE`.
+#' @param plot A logical value specifying whether the simulated price trajectories should be plotted. The default value for this argument is `FALSE`.
+#' @param ... Graphical arguments used for plotting.
 #'
 #' @keywords internal
-binary.mc <- function(obj, env, n, steps, all = FALSE) {
+binary.mc <- function(obj, env, n, steps, all = FALSE, plot = FALSE, ...) {
 
     # Check object integrity, CAN BE OMITTED
     check.args(obj, env, option = "binary")
@@ -336,9 +347,11 @@ binary.mc <- function(obj, env, n, steps, all = FALSE) {
 #' @param n A number speciying the number of simulations to make (for `method = "mc"`), or the number of time steps the life of the option will be broken into (for `method = "binomial"` and `method = "trinomial"`).
 #' @param steps A number specifying the number of steps each asset price trajectory will contain, used only for `method = "mc"`.
 #' @param all A logical value specifying whether the pricing function should return only the result price (`all = FALSE`) or other data during computation (`all = TRUE`). The default value for this argument is `FALSE`.
+#' @param plot A logical value specifying whether the simulated price trajectories should be plotted. The default value for this argument is `FALSE`.
+#' @param ... Graphical arguments used for plotting.
 #'
 #' @keywords internal
-lookback.mc <- function(obj, env, n, steps, all = FALSE) {
+lookback.mc <- function(obj, env, n, steps, all = FALSE, plot = FALSE, ...) {
     # Check object integrity, CAN BE OMITTED
     check.args(obj, env, option = "lookback")
 

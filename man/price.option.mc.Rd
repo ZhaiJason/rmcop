@@ -4,7 +4,7 @@
 \alias{price.option.mc}
 \title{Option Pricing via Monte Carlo Method}
 \usage{
-price.option.mc(obj, env, n, steps = env$steps, all)
+price.option.mc(obj, env, n, steps = env$steps, all, ...)
 }
 \arguments{
 \item{obj}{The specified \code{"option"} class object which encapsulate some properties of an option of interest.}

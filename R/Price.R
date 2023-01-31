@@ -36,13 +36,13 @@ price.option <- function(obj, env, method = env$method, n = env$n, ... , all = F
 #' @param all A logical value specifying whether the pricing function should return only the result price (`all = FALSE`) or other data during computation (`all = TRUE`). The default value for this argument is `FALSE`.
 #'
 #' @keywords internal
-price.option.mc <- function(obj, env, n, steps = env$steps, all) {
+price.option.mc <- function(obj, env, n, steps = env$steps, all, ...) {
     if (is.null(n)) stop("n is not specified")
     if (is.null(steps)) {
         steps <- 1
         warning("steps is not specified, evaluated to default value 1")
     }
-    res <- get(paste0(class(obj)[1], ".mc"))(obj, env, n, steps, all)
+    res <- get(paste0(class(obj)[1], ".mc"))(obj, env, n, steps, all, ...)
     res
 }
 

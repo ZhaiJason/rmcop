@@ -4,7 +4,7 @@
 \alias{asian.mc}
 \title{Pricing Asian option using Monte Carlo method}
 \usage{
-asian.mc(obj, env, n, steps, all = FALSE)
+asian.mc(obj, env, n, steps, all = FALSE, plot = FALSE, ...)
 }
 \arguments{
 \item{obj}{The specified \code{"option"} class object which encapsulate some properties of an option of interest.}
@@ -16,6 +16,10 @@ asian.mc(obj, env, n, steps, all = FALSE)
 \item{steps}{A number specifying the number of steps each asset price trajectory will contain, used only for \code{method = "mc"}.}
 
 \item{all}{A logical value specifying whether the pricing function should return only the result price (\code{all = FALSE}) or other data during computation (\code{all = TRUE}). The default value for this argument is \code{FALSE}.}
+
+\item{plot}{A logical value specifying whether the simulated price trajectories should be plotted. The default value for this argument is \code{FALSE}.}
+
+\item{...}{Graphical arguments used for plotting.}
 }
 \description{
 Pricing Asian option using Monte Carlo method

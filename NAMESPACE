@@ -3,5 +3,6 @@
 export(option)
 export(option.env)
 export(price.option)
+importFrom(graphics,matplot)
 importFrom(stats,pnorm)
 importFrom(stats,rnorm)
