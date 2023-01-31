@@ -96,9 +96,9 @@ vanilla.mc <- function(obj, env, n, steps, all = FALSE, plot = FALSE, ...) {
     # Compute corresponding discounted price at current time
     # Vanilla option only consider option price at maturity, so only take the last column of the price matrix S_i
     if (type == "call") {
-        C_i <- exp(-r * t) * pmax(S_i[ , steps] - K, 0)
+        C_i <- exp(-r * t) * pmax(S_i[ , steps + 1] - K, 0)
     } else if (type == "put") {
-        C_i <- exp(-r * t) * pmax(K - S_i[ , steps], 0)
+        C_i <- exp(-r * t) * pmax(K - S_i[ , steps + 1], 0)
     }
 
     # Obtain the estimate of option price by taking average of C_i
@@ -171,9 +171,9 @@ asian.mc <- function(obj, env, n, steps, all = FALSE, plot = FALSE, ...) {
         }
     } else { # Compute payoff for average strike Asian option
         if (type == "call") {
-            C_i <- exp(-r * t) * pmax(S_i[ , steps] - S.mean, 0)
+            C_i <- exp(-r * t) * pmax(S_i[ , steps + 1] - S.mean, 0)
         } else if (type == "put") {
-            C_i <- exp(-r * t) * pmax(S.mean - S_i[ , steps], 0)
+            C_i <- exp(-r * t) * pmax(S.mean - S_i[ , steps + 1], 0)
         }
     }
 
@@ -313,9 +313,9 @@ binary.mc <- function(obj, env, n, steps, all = FALSE, plot = FALSE, ...) {
     # Compute uniform payout for each MC replication of a binary option
     C_i <- matrix(exp(-r * t) * payout, nrow = n, ncol = 1)
     if (type == "call") {
-        C_i <- ifelse(S_i[, steps] > K, C_i, 0)
+        C_i <- ifelse(S_i[, steps + 1] > K, C_i, 0)
     } else if (type == "put") {
-        C_i <- ifelse(S_i[, steps] < K, C_i, 0)
+        C_i <- ifelse(S_i[, steps + 1] < K, C_i, 0)
     }
 
     # Obtain the estimate of option price by taking average of C_i
@@ -382,13 +382,13 @@ lookback.mc <- function(obj, env, n, steps, all = FALSE, plot = FALSE, ...) {
         if (is.fixed) {
             C_i <- exp(-r * t) * pmax(S.max - K, 0)
         } else {
-            C_i <- S_i[ , steps] - S.min
+            C_i <- S_i[ , steps + 1] - S.min
         }
     } else if (type == "put") {
         if (is.fixed) {
             C_i <- exp(-r * t) * pmax(K - S.min, 0)
         } else {
-            C_i <- S.max - S_i[ , steps]
+            C_i <- S.max - S_i[ , steps + 1]
         }
     }
 
