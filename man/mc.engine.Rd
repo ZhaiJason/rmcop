@@ -4,7 +4,7 @@
 \alias{mc.engine}
 \title{Engine for Monte Carlo Simulation on Asset Price Trajectory}
 \usage{
-mc.engine(type, K, t, S, r, q, sigma, n, steps)
+mc.engine(type, K, t, S0, r, q, sigma, n, steps)
 }
 \arguments{
 \item{type}{A string specifying the type of the option of interest. Possible values are either \code{"call"} or \code{"put"}, corresponding to call option (right to buy) and pull option (right to sale), respectively.}
@@ -13,7 +13,7 @@ mc.engine(type, K, t, S, r, q, sigma, n, steps)
 
 \item{t}{A number specifying the maturity/expiry of the option in years.}
 
-\item{S}{A number specifying the current price of the underlying asset.}
+\item{S0}{A number specifying the current price of the underlying asset.}
 
 \item{r}{A number specifying the (fixed) annual interest rate.}
 

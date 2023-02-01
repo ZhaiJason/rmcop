@@ -21,8 +21,9 @@ check.args <- function(obj, env, option) {
 #' @importFrom graphics matplot
 #'
 #' @keywords internal
-mc.plot <- function(S, ...) {
-    matplot(S, type = "l", col = rgb(0, 0, 0, 1), lty = 1,
+mc.plot <- function(S, threshold, ...) {
+    alpha <- 1.5^-log(ncol(S))
+    matplot(S, type = "l", col = rgb(0, 0, 0, alpha), lty = 1,
             main = "Simulated Price Trajectories", xlab = "time", ylab = "price",
             ...)
 }

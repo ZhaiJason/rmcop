@@ -4,12 +4,12 @@
 \alias{mc.plot}
 \title{Monte Carlo Price Trajectory Plot}
 \usage{
-mc.plot(S_i, ...)
+mc.plot(S, threshold, ...)
 }
 \arguments{
-\item{S_i}{Price trajectory matrix.}
-
 \item{...}{Other parameters used for plotting}
+
+\item{S_i}{Price trajectory matrix.}
 }
 \description{
 Monte Carlo Price Trajectory Plot

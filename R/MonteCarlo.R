@@ -405,7 +405,7 @@ lookback.mc <- function(obj, env, n, steps, all = FALSE, plot = FALSE, ...) {
     if (all) {
         # Return actual object environment used
         obj <- option(style = style, option = "lookback", type = type, K = K, t = t, is.fixed = is.fixed)
-        env <- option.env(method = "mc", S = S, r = r, q = q, sigma = sigma, n = n, steps = steps)
+        env <- option.env(method = "mc", S = S, r = r, q = q, sigma = sigmxa, n = n, steps = steps)
         list(
             "env" = env,
             "C.price" = C.estimate,
