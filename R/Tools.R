@@ -21,11 +21,8 @@ check.args <- function(obj, env, option) {
 #' @importFrom graphics matplot
 #'
 #' @keywords internal
-mc.plot <- function(S_i, ...) {
-    if (prod(dim(S_i)) > 10000) {
-        warning("Trajectory points with number greater than 10000, plotting may take time and the result may look fairly ugly")
-    }
-    matplot(t(S_i), type = "l",
+mc.plot <- function(S, ...) {
+    matplot(S, type = "l", col = rgb(0, 0, 0, 1), lty = 1,
             main = "Simulated Price Trajectories", xlab = "time", ylab = "price",
             ...)
 }

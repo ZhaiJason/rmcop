@@ -5,7 +5,7 @@
 #' @param type A string specifying the type of the option of interest. Possible values are either `"call"` or `"put"`, corresponding to call option (right to buy) and pull option (right to sale), respectively.
 #' @param K A number specifying the strike price of the option.
 #' @param t A number specifying the maturity/expiry of the option in years.
-#' @param S A number specifying the current price of the underlying asset.
+#' @param S0 A number specifying the current price of the underlying asset.
 #' @param r A number specifying the (fixed) annual interest rate.
 #' @param q A number specifying the (fixed) annual dividend yield rate of the option.
 #' @param sigma A number specifying the annual volatility measure.
@@ -16,31 +16,22 @@
 #' @return A matrix recording the simulated price trajectories.
 #'
 #' @keywords internal
-mc.engine <- function(type, K, t, S, r, q, sigma, n, steps) {
+mc.engine <- function(type, K, t, S0, r, q, sigma, n, steps) {
+
+    dt <- t / steps
 
     # Generate n random samples from N(0,1)
-    Z_i <- matrix(rnorm(n * steps), nrow = n)
+    Z <- matrix(rnorm(n * steps), ncol = n)
 
-    if (steps == 1) { # Path independent simulation
+    # Get logarithm of price change per step
+    increment <- (r - q - sigma^2 / 2) * dt + sigma * sqrt(dt) * Z
 
-        # Compute corresponding stock prices at maturity
-        S_i <- S * exp((r - q - sigma^2 / 2) * t + sigma * sqrt(t) * Z_i)
-        S_i <- S_i * exp(-q * t) # Adjust the asset price for dividends
-
-    } else { # Path dependent simulation
-
-        dt <- t / steps
-
-        # Get logarithm of price change per step
-        log_dS <- (r - q - sigma^2 / 2) * dt + sigma * sqrt(dt) * Z_i
-
-        # Use vectorised MC method to compute logarithm of S(t) at each time step
-        log_S_i <- log(S) + t(apply(log_dS, 1, cumsum))
-        S_i <- exp(log_S_i) # Obtain the simulated stock price by taking exponential
-        S_i <- S_i * exp(-q * t) # Adjust the asset price for dividends
-
-    }
-    S_i <- cbind(S, S_i) # Add column of current price
+    # Use vectorised MC method to compute logarithm of S(t) at each time step
+    logS <- log(S0) + apply(increment, 2, cumsum)
+    S <- exp(logS) # Obtain the simulated stock price by taking exponential
+    S <- S * exp(-q * t) # Adjust the asset price for dividends
+    S <- rbind(S0, S) # Add column of current price
+    S
 }
 
 #' Compute Monte Carlo Model's Standard Error
@@ -81,14 +72,14 @@ vanilla.mc <- function(obj, env, n, steps, all = FALSE, plot = FALSE, ...) {
     type <- obj$type
     K <- obj$K
     t <- obj$t
-    S <- env$S
+    S0 <- env$S
     r <- env$r
     q <- env$q
     sigma <- env$sigma
 
     # Apply MC
     if (style == "european") {
-        S_i <- mc.engine(type, K, t, S, r, q, sigma, n, steps)
+        S <- mc.engine(type, K, t, S0, r, q, sigma, n, steps)
     } else if (style == "american") {
         stop("American option pricing via MC not supported")
     }
@@ -96,19 +87,19 @@ vanilla.mc <- function(obj, env, n, steps, all = FALSE, plot = FALSE, ...) {
     # Compute corresponding discounted price at current time
     # Vanilla option only consider option price at maturity, so only take the last column of the price matrix S_i
     if (type == "call") {
-        C_i <- exp(-r * t) * pmax(S_i[ , steps + 1] - K, 0)
+        C <- exp(-r * t) * pmax(S[steps + 1, ] - K, 0)
     } else if (type == "put") {
-        C_i <- exp(-r * t) * pmax(K - S_i[ , steps + 1], 0)
+        C <- exp(-r * t) * pmax(K - S[steps + 1, ], 0)
     }
 
     # Obtain the estimate of option price by taking average of C_i
-    C.estimate <- mean(C_i, ...)
+    C.estimate <- mean(C, ...)
 
     # Compute standard error of the estimate
-    SE <- mc.SE(C_i, C.estimate, n)
+    SE <- mc.SE(C, C.estimate, n)
 
     # Plot function
-    if (plot) {mc.plot(S_i, ...)}
+    if (plot) {mc.plot(S, ...)}
 
     # Return result
     if (all) {
@@ -116,10 +107,10 @@ vanilla.mc <- function(obj, env, n, steps, all = FALSE, plot = FALSE, ...) {
         env <- option.env(method = "mc", S = S, r = r, q = q, sigma = sigma, n = n, steps = steps)
         list(
             "env" = env,
-            "C.estimate" = C.estimate,
+            "price" = C.estimate,
             "SE" = SE,
-            "S_i" = S_i,
-            "C_i" = C_i
+            "S" = S,
+            "C" = C
         )
     } else {
         C.estimate
@@ -147,42 +138,45 @@ asian.mc <- function(obj, env, n, steps, all = FALSE, plot = FALSE, ...) {
     K <- obj$K
     t <- obj$t
     is.avg_price <- obj$is.avg_price
-    S <- env$S
+    S0 <- env$S
     r <- env$r
     q <- env$q
     sigma <- env$sigma
 
     # Apply MC
     if (style == "european") {
-        S_i <- mc.engine(type, K, t, S, r, q, sigma, n, steps)
+        S <- mc.engine(type, K, t, S0, r, q, sigma, n, steps)
     } else if (style == "american") {
         stop("American option pricing via MC not supported")
     }
 
     # Compute the mean of each replication's price movement, as required to compute Asian option pay-off
-    S.mean <- apply(S_i, 1, mean)
+    S.mean <- apply(S, 2, mean)
 
     # Compute corresponding discounted price at current time
     if (is.avg_price) { # Compute payoff for average price Asian option
         if (type == "call") {
-            C_i <- exp(-r * t) * pmax(S.mean - K, 0)
+            C <- exp(-r * t) * pmax(S.mean - K, 0)
         } else if (type == "put") {
-            C_i <- exp(-r * t) * pmax(K - S.mean, 0)
+            C <- exp(-r * t) * pmax(K - S.mean, 0)
         }
     } else { # Compute payoff for average strike Asian option
         if (type == "call") {
-            C_i <- exp(-r * t) * pmax(S_i[ , steps + 1] - S.mean, 0)
+            C <- exp(-r * t) * pmax(S[steps + 1, ] - S.mean, 0)
         } else if (type == "put") {
-            C_i <- exp(-r * t) * pmax(S.mean - S_i[ , steps + 1], 0)
+            C <- exp(-r * t) * pmax(S.mean - S[steps + 1, ], 0)
         }
     }
 
 
     # Obtain the estimate of option price by taking average of C_i
-    C.estimate <- mean(C_i)
+    C.estimate <- mean(C)
 
     # Compute standard error of the estimate
-    SE <- mc.SE(C_i, C.estimate, n)
+    SE <- mc.SE(C, C.estimate, n)
+
+    # Plot function
+    if (plot) {mc.plot(S, ...)}
 
     # Return result
     if (all) {
@@ -190,10 +184,10 @@ asian.mc <- function(obj, env, n, steps, all = FALSE, plot = FALSE, ...) {
         env <- option.env(method = "mc", S = S, r = r, q = q, sigma = sigma, n = n, steps = steps)
         list(
             "env" = env,
-            "C.estimate" = C.estimate,
+            "price" = C.estimate,
             "SE" = SE,
-            "S_i" = S_i,
-            "C_i" = C_i
+            "S" = S,
+            "C" = C
         )
     } else {
         C.estimate
@@ -222,42 +216,45 @@ barrier.mc <- function(obj, env, n, steps, all = FALSE, plot = FALSE, ...) {
     t <- obj$t
     barrier <- obj$barrier
     is.knockout <- obj$is.knockout
-    S <- env$S
+    S0 <- env$S
     r <- env$r
     q <- env$q
     sigma <- env$sigma
 
     # Apply MC
     if (style == "european") {
-        S_i <- mc.engine(type, K, t, S, r, q, sigma, n, steps)
+        S <- mc.engine(type, K, t, S0, r, q, sigma, n, steps)
     } else if (style == "american") {
         stop("American option pricing via MC not supported")
     }
 
     # Check if price movements corssed the specified barrier
-    S.min <- apply(S_i, 1, min)
-    S.max <- apply(S_i, 1, max)
+    S.min <- apply(S, 2, min)
+    S.max <- apply(S, 2, max)
     is.cross <- (S.min < barrier & S.max > barrier)
 
     # Compute corresponding discounted price at current time
     if (type == "call") {
-        C_i <- exp(-r * t) * pmax(S_i[ , steps] - K, 0)
+        C <- exp(-r * t) * pmax(S[steps + 1, ] - K, 0)
     } else if (type == "put") {
-        C_i <- exp(-r * t) * pmax(K - S_i[ , steps], 0)
+        C <- exp(-r * t) * pmax(K - S[steps + 1, ], 0)
     }
 
     # Adjust for knock-out & knock-in situations for a barrier option
     if (is.knockout) {
-        C_i <- ifelse(is.cross, 0, C_i)
+        C <- ifelse(is.cross, 0, C)
     } else {
-        C_i <- ifelse(is.cross, C_i, 0)
+        C <- ifelse(is.cross, C, 0)
     }
 
     # Obtain the estimate of option price by taking average of C_i
-    C.estimate <- mean(C_i)
+    C.estimate <- mean(C)
 
     # Compute standard error of the estimate
-    SE <- mc.SE(C_i, C.estimate, n)
+    SE <- mc.SE(C, C.estimate, n)
+
+    # Plot function
+    if (plot) {mc.plot(S, ...)}
 
     # Return result
     if (all) {
@@ -265,10 +262,10 @@ barrier.mc <- function(obj, env, n, steps, all = FALSE, plot = FALSE, ...) {
         env <- option.env(method = "mc", S = S, r = r, q = q, sigma = sigma, n = n, steps = steps)
         list(
             "env" = env,
-            "C.estimate" = C.estimate,
+            "price" = C.estimate,
             "SE" = SE,
-            "S_i" = S_i,
-            "C_i" = C_i
+            "S" = S,
+            "C" = C
         )
     } else {
         C.estimate
@@ -297,32 +294,35 @@ binary.mc <- function(obj, env, n, steps, all = FALSE, plot = FALSE, ...) {
     K <- obj$K
     t <- obj$t
     payout <- obj$payout
-    S <- env$S
+    S0 <- env$S
     r <- env$r
     q <- env$q
     sigma <- env$sigma
 
     # Apply MC
     if (style == "european") {
-        S_i <- mc.engine(type, K, t, S, r, q, sigma, n, steps)
+        S <- mc.engine(type, K, t, S0, r, q, sigma, n, steps)
     } else if (style == "american") {
         stop("American option pricing via MC not supported")
     }
 
     # Compute corresponding discounted price at current time
     # Compute uniform payout for each MC replication of a binary option
-    C_i <- matrix(exp(-r * t) * payout, nrow = n, ncol = 1)
+    C <- matrix(exp(-r * t) * payout, nrow = n, ncol = 1)
     if (type == "call") {
-        C_i <- ifelse(S_i[, steps + 1] > K, C_i, 0)
+        C <- ifelse(S[steps + 1, ] > K, C, 0)
     } else if (type == "put") {
-        C_i <- ifelse(S_i[, steps + 1] < K, C_i, 0)
+        C <- ifelse(S[steps + 1, ] < K, C, 0)
     }
 
     # Obtain the estimate of option price by taking average of C_i
-    C.estimate <- mean(C_i)
+    C.estimate <- mean(C)
 
     # Compute standard error of the estimate
-    SE <- mc.SE(C_i, C.estimate, n)
+    SE <- mc.SE(C, C.estimate, n)
+
+    # Plot function
+    if (plot) {mc.plot(S, ...)}
 
     # Return result
     if (all) {
@@ -330,10 +330,10 @@ binary.mc <- function(obj, env, n, steps, all = FALSE, plot = FALSE, ...) {
         env <- option.env(method = "mc", S = S, r = r, q = q, sigma = sigma, n = n, steps = steps)
         list(
             "env" = env,
-            "C.estimate" = C.estimate,
+            "price" = C.estimate,
             "SE" = SE,
-            "S_i" = S_i,
-            "C_i" = C_i
+            "S" = S,
+            "C" = C
         )
     } else {
         C.estimate
@@ -361,42 +361,45 @@ lookback.mc <- function(obj, env, n, steps, all = FALSE, plot = FALSE, ...) {
     K <- obj$K
     t <- obj$t
     is.fixed <- obj$is.fixed
-    S <- env$S
+    S0 <- env$S
     r <- env$r
     q <- env$q
     sigma <- env$sigma
 
     # Apply MC
     if (style == "european") {
-        S_i <- mc.engine(type, K, t, S, r, q, sigma, n, steps)
+        S <- mc.engine(type, K, t, S0, r, q, sigma, n, steps)
     } else if (style == "american") {
         stop("American option pricing via MC not supported")
     }
 
     # Check if price movements corssed the specified barrier
-    S.min <- apply(S_i, 1, min)
-    S.max <- apply(S_i, 1, max)
+    S.min <- apply(S, 2, min)
+    S.max <- apply(S, 2, max)
 
     # Compute corresponding discounted price at current time
     if (type == "call") {
         if (is.fixed) {
-            C_i <- exp(-r * t) * pmax(S.max - K, 0)
+            C <- exp(-r * t) * pmax(S.max - K, 0)
         } else {
-            C_i <- S_i[ , steps + 1] - S.min
+            C <- S[steps + 1, ] - S.min
         }
     } else if (type == "put") {
         if (is.fixed) {
-            C_i <- exp(-r * t) * pmax(K - S.min, 0)
+            C <- exp(-r * t) * pmax(K - S.min, 0)
         } else {
-            C_i <- S.max - S_i[ , steps + 1]
+            C <- S.max - S[steps + 1, ]
         }
     }
 
     # Obtain the estimate of option price by taking average of C_i
-    C.estimate <- mean(C_i)
+    C.estimate <- mean(C)
 
     # Compute standard error of the estimate
-    SE <- mc.SE(C_i, C.estimate, n)
+    SE <- mc.SE(C, C.estimate, n)
+
+    # Plot function
+    if (plot) {mc.plot(S, ...)}
 
     # Return result
     if (all) {
@@ -405,10 +408,10 @@ lookback.mc <- function(obj, env, n, steps, all = FALSE, plot = FALSE, ...) {
         env <- option.env(method = "mc", S = S, r = r, q = q, sigma = sigma, n = n, steps = steps)
         list(
             "env" = env,
-            "C.estimate" = C.estimate,
+            "C.price" = C.estimate,
             "SE" = SE,
-            "S_i" = S_i,
-            "C_i" = C_i
+            "S" = S,
+            "C" = C
         )
     } else {
         C.estimate

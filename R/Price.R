@@ -42,7 +42,7 @@ price.option.mc <- function(obj, env, n, steps = env$steps, all, ...) {
         steps <- 1
         warning("steps is not specified, evaluated to default value 1")
     }
-    res <- get(paste0(class(obj)[1], ".mc"))(obj, env, n, steps, all, ...)
+    res <- get(paste0(class(obj)[1], ".mc"))(obj = obj, env = env, n = n, steps = steps, all = all, ...)
     res
 }
 
