@@ -4,12 +4,12 @@
 \alias{mc.SE}
 \title{Compute Monte Carlo Model's Standard Error}
 \usage{
-mc.SE(C_i, C.estimate, n)
+mc.SE(C_i, C.mean, n)
 }
 \arguments{
 \item{C_i}{A matrix recording the resulted option pay-offs from Monte Carlo simulations.}
 
-\item{C.estimate}{A number recording the resulted estimate of the price of the option.}
+\item{C.mean}{A number recording the resulted estimate of the price of the option.}
 
 \item{n}{A number speciying the number of simulations to make (for \code{method = "mc"}), or the number of time steps the life of the option will be broken into (for \code{method = "binomial"} and \code{method = "trinomial"}).}
 }

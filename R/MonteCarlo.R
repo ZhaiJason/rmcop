@@ -37,14 +37,14 @@ mc.engine <- function(type, K, t, S0, r, q, sigma, n, steps) {
 #' Compute Monte Carlo Model's Standard Error
 #'
 #' @param C_i A matrix recording the resulted option pay-offs from Monte Carlo simulations.
-#' @param C.estimate A number recording the resulted estimate of the price of the option.
+#' @param C.mean A number recording the resulted estimate of the price of the option.
 #' @param n A number speciying the number of simulations to make (for `method = "mc"`), or the number of time steps the life of the option will be broken into (for `method = "binomial"` and `method = "trinomial"`).
 #'
 #' @return A number recording the standard error of the corresponding Monte Carlo estimate of the option price.
 #'
 #' @keywords internal
-mc.SE <- function(C_i, C.estimate, n) {
-    s_c <- sqrt(sum(C_i - C.estimate)^2 / (n - 1))
+mc.SE <- function(C_i, C.mean, n) {
+    s_c <- sqrt(sum(C_i - C.mean)^2 / (n - 1))
     SE <- s_c / sqrt(n)
     SE
 }
@@ -93,10 +93,10 @@ vanilla.mc <- function(obj, env, n, steps, all = FALSE, plot = FALSE, ...) {
     }
 
     # Obtain the estimate of option price by taking average of C_i
-    C.estimate <- mean(C, ...)
+    C.mean <- mean(C, ...)
 
     # Compute standard error of the estimate
-    SE <- mc.SE(C, C.estimate, n)
+    SE <- mc.SE(C, C.mean, n)
 
     # Plot function
     if (plot) {mc.plot(S, ...)}
@@ -107,13 +107,13 @@ vanilla.mc <- function(obj, env, n, steps, all = FALSE, plot = FALSE, ...) {
         env <- option.env(method = "mc", S = S, r = r, q = q, sigma = sigma, n = n, steps = steps)
         list(
             "env" = env,
-            "price" = C.estimate,
+            "price" = C.mean,
             "SE" = SE,
             "S" = S,
             "C" = C
         )
     } else {
-        C.estimate
+        C.mean
     }
 }
 
@@ -170,10 +170,10 @@ asian.mc <- function(obj, env, n, steps, all = FALSE, plot = FALSE, ...) {
 
 
     # Obtain the estimate of option price by taking average of C_i
-    C.estimate <- mean(C)
+    C.mean <- mean(C)
 
     # Compute standard error of the estimate
-    SE <- mc.SE(C, C.estimate, n)
+    SE <- mc.SE(C, C.mean, n)
 
     # Plot function
     if (plot) {mc.plot(S, ...)}
@@ -184,13 +184,13 @@ asian.mc <- function(obj, env, n, steps, all = FALSE, plot = FALSE, ...) {
         env <- option.env(method = "mc", S = S, r = r, q = q, sigma = sigma, n = n, steps = steps)
         list(
             "env" = env,
-            "price" = C.estimate,
+            "price" = C.mean,
             "SE" = SE,
             "S" = S,
             "C" = C
         )
     } else {
-        C.estimate
+        C.mean
     }
 }
 
@@ -248,10 +248,10 @@ barrier.mc <- function(obj, env, n, steps, all = FALSE, plot = FALSE, ...) {
     }
 
     # Obtain the estimate of option price by taking average of C_i
-    C.estimate <- mean(C)
+    C.mean <- mean(C)
 
     # Compute standard error of the estimate
-    SE <- mc.SE(C, C.estimate, n)
+    SE <- mc.SE(C, C.mean, n)
 
     # Plot function
     if (plot) {mc.plot(S, ...)}
@@ -262,13 +262,13 @@ barrier.mc <- function(obj, env, n, steps, all = FALSE, plot = FALSE, ...) {
         env <- option.env(method = "mc", S = S, r = r, q = q, sigma = sigma, n = n, steps = steps)
         list(
             "env" = env,
-            "price" = C.estimate,
+            "price" = C.mean,
             "SE" = SE,
             "S" = S,
             "C" = C
         )
     } else {
-        C.estimate
+        C.mean
     }
 }
 
@@ -316,10 +316,10 @@ binary.mc <- function(obj, env, n, steps, all = FALSE, plot = FALSE, ...) {
     }
 
     # Obtain the estimate of option price by taking average of C_i
-    C.estimate <- mean(C)
+    C.mean <- mean(C)
 
     # Compute standard error of the estimate
-    SE <- mc.SE(C, C.estimate, n)
+    SE <- mc.SE(C, C.mean, n)
 
     # Plot function
     if (plot) {mc.plot(S, ...)}
@@ -330,13 +330,13 @@ binary.mc <- function(obj, env, n, steps, all = FALSE, plot = FALSE, ...) {
         env <- option.env(method = "mc", S = S, r = r, q = q, sigma = sigma, n = n, steps = steps)
         list(
             "env" = env,
-            "price" = C.estimate,
+            "price" = C.mean,
             "SE" = SE,
             "S" = S,
             "C" = C
         )
     } else {
-        C.estimate
+        C.mean
     }
 }
 
@@ -393,10 +393,10 @@ lookback.mc <- function(obj, env, n, steps, all = FALSE, plot = FALSE, ...) {
     }
 
     # Obtain the estimate of option price by taking average of C_i
-    C.estimate <- mean(C)
+    C.mean <- mean(C)
 
     # Compute standard error of the estimate
-    SE <- mc.SE(C, C.estimate, n)
+    SE <- mc.SE(C, C.mean, n)
 
     # Plot function
     if (plot) {mc.plot(S, ...)}
@@ -408,12 +408,12 @@ lookback.mc <- function(obj, env, n, steps, all = FALSE, plot = FALSE, ...) {
         env <- option.env(method = "mc", S = S, r = r, q = q, sigma = sigmxa, n = n, steps = steps)
         list(
             "env" = env,
-            "C.price" = C.estimate,
+            "C.price" = C.mean,
             "SE" = SE,
             "S" = S,
             "C" = C
         )
     } else {
-        C.estimate
+        C.mean
     }
 }
