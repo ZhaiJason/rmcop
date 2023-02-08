@@ -1,32 +1,79 @@
-test_that("multiplication works", {
-  expect_equal(2 * 2, 4)
-})
-
 test_that("create vanilla option", {
+    obj <- list(
+        "style" = "european",
+        "type" = "call",
+        "K" = 20,
+        "t" = 1
+    )
+    attr(obj, "class") <- c("vanilla", "option")
+
     expect_equal(
         option("european", "vanilla", "call", K = 20, t = 1),
-        list(
-            "style" = "european",
-            "type" = "call",
-            "K" = 20,
-            "t" = 1
-        )
+        obj
     )
 })
 
+test_that("create asian option", {
+    obj <- list(
+        "style" = "european",
+        "type" = "call",
+        "K" = 20,
+        "t" = 1,
+        "is.avg_price" = FALSE
+    )
+    attr(obj, "class") <- c("asian", "option")
 
+    expect_equal(
+        option("european", "asian", "call", K = 20, t = 1, is.avg_price = FALSE),
+        obj
+    )
+})
 
-# Create an European vanilla option with strike price 20, expiry in 1 year.
-vanilla1 <- option("european", "vanilla", "call", K = 20, t = 1)
+test_that("create barrier option", {
+    obj <- list(
+        "style" = "european",
+        "type" = "call",
+        "K" = 20,
+        "t" = 1,
+        barrier = 21,
+        is.knockout = TRUE
+    )
+    attr(obj, "class") <- c("barrier", "option")
 
-# Create European  average strike Asian option with strike price 20, expiry in 1 year.
-asian1 <- option("european", "asian", "call", K = 20, t = 1, is.avg_price = FALSE)
+    expect_equal(
+        option("european", "barrier", "call", K = 20, t = 1, barrier = 21, is.knockout = TRUE),
+        obj
+    )
+})
 
-# Create European knock-out barrier option with strike price 20, barrier price 21, expiry in 1 year.
-barrier1 <- option("european", "barrier", "call", K = 20, t = 1, barrier = 21, is.knockout = TRUE)
+test_that("create binary option", {
+    obj <- list(
+        "style" = "european",
+        "type" = "call",
+        "K" = 20,
+        "t" = 1,
+        payout = 5
+    )
+    attr(obj, "class") <- c("binary", "option")
 
-# Create European binary option with strike price 20, fixed payout 5, expiry in 1 year.
-binary1 <- option("european", "binary", "call", K = 20, t = 1, payout = 5)
+    expect_equal(
+        option("european", "binary", "call", K = 20, t = 1, payout = 5),
+        obj
+    )
+})
 
-# Create European fixed strike lookback option with strike price 20, expiry in 1 year.
-lookback1 <- option("european", "lookback", "call", K = 20, t = 1, is.fixed = TRUE)
+test_that("create lookback option", {
+    obj <- list(
+        "style" = "european",
+        "type" = "call",
+        "K" = 20,
+        "t" = 1,
+        is.fixed = TRUE
+    )
+    attr(obj, "class") <- c("lookback", "option")
+
+    expect_equal(
+        option("european", "lookback", "call", K = 20, t = 1, is.fixed = TRUE),
+        obj
+    )
+})
