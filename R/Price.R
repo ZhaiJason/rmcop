@@ -80,18 +80,3 @@ price.option.binomial <- function(obj, env, n, u, d, all) {
     res <- get(paste0(class(obj)[1], ".binomial"))(obj = obj, env = env, n = n, u = u, d = d, all = all)
     res
 }
-
-#' Option Pricing via Trinomial Lattice Model
-
-#' @param obj The specified `"option"` class object which encapsulate some properties of an option of interest.
-#'
-#' @param env The specified `"env"` class object which encapsulate some market variables required by corresponding pricing methods.
-#' @param n A number speciying the number of simulations to make (for `method = "mc"`), or the number of time steps the life of the option will be broken into (for `method = "binomial"` and `method = "trinomial"`).
-#' @param u A number representing the ratio of an upward price movement. Notice here a ratio for down jump is not specified, this is because under the Trinomial model we assume that d = 1/u.
-#' @param all A logical value specifying whether the pricing function should return only the result price (`all = FALSE`) or other data during computation (`all = TRUE`). The default value for this argument is `FALSE`.
-#'
-#' @keywords internal
-price.option.trinomial <- function(obj, env, n, u, all) {
-    res <- get(paste0(class(obj)[1], ".trinomial"))(obj = obj, env = env, n = n, u = u, all = all)
-    res
-}
