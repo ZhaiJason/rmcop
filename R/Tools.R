@@ -19,6 +19,7 @@ check.args <- function(obj, env, option) {
 #' @param ... Other parameters used for plotting
 #'
 #' @importFrom graphics matplot
+#' @importFrom grDevices rgb
 #'
 #' @keywords internal
 mc.plot <- function(S, threshold, ...) {

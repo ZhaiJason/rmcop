@@ -3,6 +3,7 @@
 export(option)
 export(option.env)
 export(price.option)
+importFrom(grDevices,rgb)
 importFrom(graphics,matplot)
 importFrom(stats,pnorm)
 importFrom(stats,rnorm)
