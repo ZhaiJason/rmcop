@@ -25,9 +25,6 @@
 #'
 #' # Binomial Lattice Tree
 #' price.option(op, op.env, n = 10, u = 1.2, d = 0.8, method = "binomial", all = FALSE)
-#'
-#' # Trinomial Lattice Tree
-#' price.option(op, op.env, n = 10, u = 1.2, method = "trinomial", all = FALSE)
 price.option <- function(obj, env, method = env$method, n = env$n, ... , all = FALSE) {
     if (is.null(method)) stop("Pricing method not specified")
     res <- get(paste0("price.option.", method))(obj = obj, env = env, n = n, ..., all = all)

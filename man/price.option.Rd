@@ -35,7 +35,4 @@ price.option(op, op.env, n = 100, steps = 10, all = FALSE, plot = FALSE)
 
 # Binomial Lattice Tree
 price.option(op, op.env, n = 10, u = 1.2, d = 0.8, method = "binomial", all = FALSE)
-
-# Trinomial Lattice Tree
-price.option(op, op.env, n = 10, u = 1.2, method = "trinomial", all = FALSE)
 }
