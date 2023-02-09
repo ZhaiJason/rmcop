@@ -33,6 +33,9 @@ op.env <- option.env(S = 20, r = 0.03, q = 0.01, sigma = 0.05)
 # Monte Carlo
 price.option(op, op.env, n = 100, steps = 10, all = FALSE, plot = FALSE)
 
+# Black-Scholes
+price.option(op, op.env, method = "bs", all = FALSE)
+
 # Binomial Lattice Tree
 price.option(op, op.env, n = 10, u = 1.2, d = 0.8, method = "binomial", all = FALSE)
 }

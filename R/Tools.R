@@ -1,6 +1,28 @@
+# Check whether option object is well-defined ==================================
+
+#' Check option object integrity
+#'
+#' @param obj The defined option class object.
+#'
+#' @keywords internal
+check.option <- function(obj) {
+    NA
+}
+
+# Check whether env object is well-defined =====================================
+
+#' Check env object integrity
+#'
+#' @param env The defined env class object
+#'
+#' @keywords internal
+check.env <- function(env) {
+    NA
+}
+
 # Check pricing function input argument integrity ==============================
 
-#' Object integrity check for price.option functions
+#' Check argument inputs integrity for price.option function
 #'
 #' @param obj The specified `"option"` class object which encapsulate some properties of an option of interest.
 #' @param env The specified `"env"` class object which encapsulate some market variables required by corresponding pricing methods.

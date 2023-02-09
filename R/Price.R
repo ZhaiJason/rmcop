@@ -23,6 +23,9 @@
 #' # Monte Carlo
 #' price.option(op, op.env, n = 100, steps = 10, all = FALSE, plot = FALSE)
 #'
+#' # Black-Scholes
+#' price.option(op, op.env, method = "bs", all = FALSE)
+#'
 #' # Binomial Lattice Tree
 #' price.option(op, op.env, n = 10, u = 1.2, d = 0.8, method = "binomial", all = FALSE)
 price.option <- function(obj, env, method = env$method, n = env$n, ... , all = FALSE) {
@@ -59,6 +62,11 @@ price.option.mc <- function(obj, env, n, steps = env$steps, all, ...) {
 #'
 #' @keywords internal
 price.option.bs <- function(obj, env, n, all) {
+    if (obj$style == "american") {
+        if (env$q != 0 | obj$type != "call") {
+            warning("Black Scholes valuation should only apply on European european options or American call option with non-dividend paying asset, the result here will be based on European options pricing and may not be accurate.")
+        }
+    }
     res <- get(paste0(class(obj)[1], ".bs"))(obj, env, all)
     res
 }

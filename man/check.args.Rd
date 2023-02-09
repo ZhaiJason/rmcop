@@ -2,7 +2,7 @@
 % Please edit documentation in R/Tools.R
 \name{check.args}
 \alias{check.args}
-\title{Object integrity check for price.option functions}
+\title{Check argument inputs integrity for price.option function}
 \usage{
 check.args(obj, env, option)
 }
@@ -12,6 +12,6 @@ check.args(obj, env, option)
 \item{env}{The specified \code{"env"} class object which encapsulate some market variables required by corresponding pricing methods.}
 }
 \description{
-Object integrity check for price.option functions
+Check argument inputs integrity for price.option function
 }
 \keyword{internal}
