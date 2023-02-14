@@ -382,13 +382,13 @@ lookback.mc <- function(obj, env, n, steps, all = FALSE, plot = FALSE, ...) {
         if (is.fixed) {
             C <- exp(-r * t) * pmax(S.max - K, 0)
         } else {
-            C <- S[steps + 1, ] - S.min
+            C <- exp(-r * t) * (S[steps + 1, ] - S.min)
         }
     } else if (type == "put") {
         if (is.fixed) {
             C <- exp(-r * t) * pmax(K - S.min, 0)
         } else {
-            C <- S.max - S[steps + 1, ]
+            C <- exp(-r * t) * (S.max - S[steps + 1, ])
         }
     }
 
