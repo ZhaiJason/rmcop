@@ -92,7 +92,7 @@ vanilla.mc <- function(obj, env, n, steps, all = FALSE, plot = FALSE, ...) {
         C <- exp(-r * t) * pmax(K - S[steps + 1, ], 0)
     }
 
-    # Obtain the estimate of option price by taking average of C_i
+    # Obtain the estimate of option price by taking average of C
     C.mean <- mean(C, ...)
 
     # Compute standard error of the estimate
@@ -169,7 +169,7 @@ asian.mc <- function(obj, env, n, steps, all = FALSE, plot = FALSE, ...) {
     }
 
 
-    # Obtain the estimate of option price by taking average of C_i
+    # Obtain the estimate of option price by taking average of C
     C.mean <- mean(C)
 
     # Compute standard error of the estimate
@@ -247,7 +247,7 @@ barrier.mc <- function(obj, env, n, steps, all = FALSE, plot = FALSE, ...) {
         C <- ifelse(is.cross, C, 0)
     }
 
-    # Obtain the estimate of option price by taking average of C_i
+    # Obtain the estimate of option price by taking average of C
     C.mean <- mean(C)
 
     # Compute standard error of the estimate
@@ -315,7 +315,7 @@ binary.mc <- function(obj, env, n, steps, all = FALSE, plot = FALSE, ...) {
         C <- ifelse(S[steps + 1, ] < K, C, 0)
     }
 
-    # Obtain the estimate of option price by taking average of C_i
+    # Obtain the estimate of option price by taking average of C
     C.mean <- mean(C)
 
     # Compute standard error of the estimate
@@ -392,7 +392,7 @@ lookback.mc <- function(obj, env, n, steps, all = FALSE, plot = FALSE, ...) {
         }
     }
 
-    # Obtain the estimate of option price by taking average of C_i
+    # Obtain the estimate of option price by taking average of C
     C.mean <- mean(C)
 
     # Compute standard error of the estimate
