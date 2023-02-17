@@ -100,7 +100,6 @@ vanilla.binomial <- function(obj, env, n, u, d, all = FALSE) {
 
     # Store the stock prices of the tree for each state in a matrix `price_tree`
     price_tree <- Binomial.tree(S, u, d, n)
-    price_tree[upper.tri(price_tree)] <- NA
     Sn <- price_tree[n + 1, ] # Stores the possible stock prices at the terminal steps.
 
     # Calculate the option value at the final step, i.e. maturity.
