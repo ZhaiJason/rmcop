@@ -139,7 +139,7 @@ option.exotic.lookback <- function(obj, is.fixed = TRUE) {
 
 #' Initialise new `env` class object
 #'
-#' @param method A string specifying the method used to price the option. Supported values are `"mc"` (Monte Carlo Method), `"bs"` (for Black-Scholes formula), `"binomial"` (Binomial Lattice Tree), and `"trinomial"` (Trinomial Lattice Tree).
+#' @param method A string specifying the method used to price the option. Supported values are `"mc"` (Monte Carlo Method), `"bs"` (for Black-Scholes formula), `"binomial"` (Binomial Lattice Tree).
 #' @param S A number specifying the current price of the underlying asset.
 #' @param r A number specifying the (fixed) annual interest rate.
 #' @param q A number specifying the (fixed) annual dividend yield rate of the option.
