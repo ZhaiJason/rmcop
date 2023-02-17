@@ -7,7 +7,7 @@
 option.env(method = "mc", S, r, q = 0, sigma, n = NULL, steps = NULL)
 }
 \arguments{
-\item{method}{A string specifying the method used to price the option. Supported values are \code{"mc"} (Monte Carlo Method), \code{"bs"} (for Black-Scholes formula), \code{"binomial"} (Binomial Lattice Tree), and \code{"trinomial"} (Trinomial Lattice Tree).}
+\item{method}{A string specifying the method used to price the option. Supported values are \code{"mc"} (Monte Carlo Method), \code{"bs"} (for Black-Scholes formula), \code{"binomial"} (Binomial Lattice Tree).}
 
 \item{S}{A number specifying the current price of the underlying asset.}
 

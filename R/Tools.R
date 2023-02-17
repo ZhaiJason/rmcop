@@ -20,6 +20,23 @@ check.env <- function(env) {
     NA
 }
 
+# Check whether specified method is supported ==================================
+
+#' Check method supporting status
+#'
+#' @param method The specified method to check if is supported by the package.
+#'
+#' @keywords internal
+check.method <- function(method) {
+    supported <- c("mc", "bs", "binomial")
+    if (is.null(method)) stop("Pricing method not specified")
+    if (!(method %in% supported)) {
+        stop(
+            paste("Specified method ", method, " is not supported, use `help(price.option)` to check supported pricing methods")
+        )
+    }
+}
+
 # Check pricing function input argument integrity ==============================
 
 #' Check argument inputs integrity for price.option function
