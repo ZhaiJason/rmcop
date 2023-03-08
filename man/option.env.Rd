@@ -25,11 +25,11 @@ option.env(method = "mc", S, r, q = 0, sigma, n = NULL, steps = NULL)
 An S3 object with \code{class} attribute evaluated to \code{"env"}.
 }
 \description{
-Initialise new \code{env} class object
+Create an S3 class object which characterised the market environment used when pricing the option of interest. The returned object is used together with an \code{"option"} class object as inputs of the pricing function \code{price.option}.
 }
 \examples{
 # Create an environment with current price 20, annual interest rate 2\%,
 # annual dividend yield rate 1\%, annual volatility measure 0.05, and number
 # of simulations set to 100
-env1 <- option.env(S = 20, r = 0.02, q = 0.01, sigma = 0.05, n = 100)
+option.env(S = 20, r = 0.02, q = 0.01, sigma = 0.05, n = 100)
 }

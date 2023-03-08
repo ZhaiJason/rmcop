@@ -15,7 +15,12 @@ price.option(obj, env, method = env$method, n = env$n, ..., all = FALSE)
 
 \item{n}{A number speciying the number of simulations to make (for \code{method = "mc"}), or the number of time steps the life of the option will be broken into (for \code{method = "binomial"} and \code{method = "trinomial"}).}
 
-\item{...}{Arguments required by corresponding specified option pricing methods.}
+\item{...}{Arguments required by corresponding specified option pricing methods.
+\itemize{
+\item \code{steps}:
+\item \code{u}:
+\item \code{d}: Used when \code{method = "binomial"}
+}}
 
 \item{all}{A boolean specifying whether the pricing function should return only the result price (if \code{FALSE}) or other (maybe useful) data during computation (if \code{TRUE}). The default value for this argument is \code{FALSE}.}
 }
@@ -23,13 +28,14 @@ price.option(obj, env, method = env$method, n = env$n, ..., all = FALSE)
 The result estimate/solution of the option price.
 }
 \description{
-Pricing \code{option} Class Object
+The all-in-one pricing function for \code{rmcop}. User should predefine an \code{"option"} class object and an \code{"env"} class object as inputs of \code{price.option}. According to the pricing method selected, the user shall provide additional inputs as instructions for the pricing function. Depending
 }
 \examples{
-# Define a sample option with corresponding env object
+# To use price.option, we first define the "option" and "env" objects
 op <- option("european", "vanilla", "call", 20, 0.75)
 op.env <- option.env(S = 20, r = 0.03, q = 0.01, sigma = 0.05)
 
+# The below codes
 # Monte Carlo
 price.option(op, op.env, n = 100, steps = 10, all = FALSE, plot = FALSE)
 

@@ -17,27 +17,34 @@ option(style, option = "vanilla", type, K, t, ...)
 
 \item{t}{A number specifying the maturity/expiry of the option in years.}
 
-\item{...}{Arguments required by corresponding specified option families.}
+\item{...}{Arguments required by corresponding specified option families.
+\itemize{
+\item \code{is.avg_price}: A logical value for \code{option = "asian"} case, specifying whether the option is an "average price Asian option" or "average strike Asian option". The default value for this argument is \code{TRUE}, indicating the option being an "average price Asian option".
+\item \code{barrier}: A number for \verb{option = "barrier} case, specifying the barrier price of the barrier option.
+\item \code{is.knockout}: A logical value for \code{option = "barrier"} class objects, specifying whether the option is an "knock-out barrier option" (\code{is.knockout = TRUE}) or "knock-in barrier option" (\code{is.knockout = FALSE}).
+\item \code{payout}: A number for \code{option = "binary"} class objects, specifying the payout of a binary option.
+\item \code{is.fixed}: A logical value for \code{option = "lookback"} class objects. specifying whether the option is an "fixed strike look-back option" (\code{is.fixed = TRUE}) or "floating strike look-back option" (\code{is.fixed = FALSE}).
+}}
 }
 \value{
-An S3 object with \code{class} attribute evaluated to \code{"option"}.
+An S3 object with \code{class} attribute evaluated to \code{"option"}. This object can then be used for pricing together with an \code{"env"} class object through \code{price.option()} function.
 }
 \description{
-Initialise new \code{option} class object
+Create an S3 class object which characterised an option of interest. The returned object is then used together with a \code{"env"} class object together as inputs of the \code{price.option} function for further option pricing.
 }
 \examples{
 # Create an European vanilla option with strike price 20, expiry in 1 year.
-vanilla1 <- option("european", "vanilla", "call", K = 20, t = 1)
+option("european", "vanilla", "call", K = 20, t = 1)
 
 # Create European  average strike Asian option with strike price 20, expiry in 1 year.
-asian1 <- option("european", "asian", "call", K = 20, t = 1, is.avg_price = FALSE)
+option("european", "asian", "call", K = 20, t = 1, is.avg_price = FALSE)
 
 # Create European knock-out barrier option with strike price 20, barrier price 21, expiry in 1 year.
-barrier1 <- option("european", "barrier", "call", K = 20, t = 1, barrier = 21, is.knockout = TRUE)
+option("european", "barrier", "call", K = 20, t = 1, barrier = 21, is.knockout = TRUE)
 
 # Create European binary option with strike price 20, fixed payout 5, expiry in 1 year.
-binary1 <- option("european", "binary", "call", K = 20, t = 1, payout = 5)
+option("european", "binary", "call", K = 20, t = 1, payout = 5)
 
 # Create European fixed strike lookback option with strike price 20, expiry in 1 year.
-lookback1 <- option("european", "lookback", "call", K = 20, t = 1, is.fixed = TRUE)
+option("european", "lookback", "call", K = 20, t = 1, is.fixed = TRUE)
 }
