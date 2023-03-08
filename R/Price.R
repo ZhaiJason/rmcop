@@ -5,21 +5,29 @@
 
 #' Pricing `option` Class Object
 #'
+#' The all-in-one pricing function for `rmcop`. User should predefine an `"option"` class object and an `"env"` class object as inputs of `price.option`. According to the pricing method selected, the user shall provide additional inputs as instructions for the pricing function. Depending
+#'
 #' @param obj The specified `"option"` class object which encapsulate some properties of an option of interest.
 #' @param env The predefined `option.env` object, which contains specified arguments
 #' @param method A string specifying the method used to price the option. Supported values are `"mc"` (Monte Carlo Method), `"bs"` (for Black-Scholes formula), `"binomial"` (Binomial Lattice Tree), and `"trinomial"` (Trinomial Lattice Tree).
 #' @param n A number speciying the number of simulations to make (for `method = "mc"`), or the number of time steps the life of the option will be broken into (for `method = "binomial"` and `method = "trinomial"`).
 #' @param ... Arguments required by corresponding specified option pricing methods.
+#' \itemize{
+#'      \item \code{steps}:
+#'      \item \code{u}:
+#'      \item \code{d}: Used when `method = "binomial"`
+#' }
 #' @param all A boolean specifying whether the pricing function should return only the result price (if `FALSE`) or other (maybe useful) data during computation (if `TRUE`). The default value for this argument is `FALSE`.
 #'
 #' @return The result estimate/solution of the option price.
 #' @export
 #'
 #' @examples
-#' # Define a sample option with corresponding env object
+#' # To use price.option, we first define the "option" and "env" objects
 #' op <- option("european", "vanilla", "call", 20, 0.75)
 #' op.env <- option.env(S = 20, r = 0.03, q = 0.01, sigma = 0.05)
 #'
+#' # The below codes
 #' # Monte Carlo
 #' price.option(op, op.env, n = 100, steps = 10, all = FALSE, plot = FALSE)
 #'
