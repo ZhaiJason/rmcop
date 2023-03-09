@@ -10,7 +10,7 @@
 #' Create an S3 class object which characterised an option of interest. The returned object is then used together with a `"env"` class object together as inputs of the `price.option` function for further option pricing.
 #'
 #' @param style A string specifying the style of the option of interest. Possible values are `"european"` and `"american"`, corresponding to European options and American options, respectively.
-#' @param option A string specifying the specific family of the option of interest. Supported values are: `"vanilla"` (default, for Vanilla options), `"asian"` (for Asian options), `"barrier"` (for Barrier options), `"binary"` (for Binary/Cash-or-nothing options), and `"lookback"` (for Lookback options).
+#' @param option A string specifying the specific family of the option of interest. Supported values are: `"vanilla"` (default, for Vanilla options), `"asian"` (for Asian options), `"barrier"` (for Barrier options), `"binary"` (for Binary/Cash-or-nothing options), and `"lookback"` (for Lookback options). This argument is a string that specifies the subclass of the S3 class `"option"` for the defined object.
 #' @param type A string specifying the type of the option of interest. Possible values are either `"call"` or `"put"`, corresponding to call option (right to buy) and pull option (right to sale), respectively.
 #' @param K A number specifying the strike price of the option.
 #' @param t A number specifying the maturity/expiry of the option in years.

@@ -9,7 +9,7 @@ option(style, option = "vanilla", type, K, t, ...)
 \arguments{
 \item{style}{A string specifying the style of the option of interest. Possible values are \code{"european"} and \code{"american"}, corresponding to European options and American options, respectively.}
 
-\item{option}{A string specifying the specific family of the option of interest. Supported values are: \code{"vanilla"} (default, for Vanilla options), \code{"asian"} (for Asian options), \code{"barrier"} (for Barrier options), \code{"binary"} (for Binary/Cash-or-nothing options), and \code{"lookback"} (for Lookback options).}
+\item{option}{A string specifying the specific family of the option of interest. Supported values are: \code{"vanilla"} (default, for Vanilla options), \code{"asian"} (for Asian options), \code{"barrier"} (for Barrier options), \code{"binary"} (for Binary/Cash-or-nothing options), and \code{"lookback"} (for Lookback options). This argument is a string that specifies the subclass of the S3 class \code{"option"} for the defined object.}
 
 \item{type}{A string specifying the type of the option of interest. Possible values are either \code{"call"} or \code{"put"}, corresponding to call option (right to buy) and pull option (right to sale), respectively.}
 
