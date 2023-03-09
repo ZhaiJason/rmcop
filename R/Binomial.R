@@ -11,6 +11,7 @@
 #'
 #' @keywords internal
 Binomial.tree <- function(S0, u, d, n) {
+    if (is.null(n)) stop("Number of binomial tree steps n is not defined.")
     dim <- n + 1
     S <- matrix(nrow = dim, ncol = dim) # Predefine the size
     temp <- c(S0)
