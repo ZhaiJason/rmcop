@@ -9,6 +9,12 @@ test_that("mc works", {
 
 test_that("binomial works", {
     expect_equal(price.option(op, op.env, n = 100, u = 1.2, d = 0.8, method = "binomial", all = FALSE),
-                 13.80,
-                 tolerance = 1e-2)
+                 13.77929,
+                 tolerance = 1e-5)
+})
+
+test_that("binomial works", {
+    expect_equal(price.option(op, op.env, method = "bs", all = FALSE),
+                 0.5083162,
+                 tolerance = 1e-7)
 })
