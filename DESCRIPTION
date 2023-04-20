@@ -2,7 +2,7 @@ Package: rmcop
 Title: R Monte Carlo Option Pricing
 Version: 1.0.0.9000
 Authors@R: 
-    person("Yuze", "Zhai", , "jason.zhai.20@ucl.ac.uk", role = c("aut", "cre"))
+    person("20019563", "20019563", , "zcakyz9@ucl.ac.uk", role = c("aut", "cre"))
 Description: An R package that contains functions for pricing financial options. rmcop supports Monte Carlo option pricing on several types of European options, including *vanilla option*, *Asian option*, **barrier option*, *binary option*, and *lookback option*. It also supports pricing via Black-Scholes formula and Binomial tree method for vanilla European and American options.
 License: MIT + file LICENSE
 Encoding: UTF-8
