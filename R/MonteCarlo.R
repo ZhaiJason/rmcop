@@ -168,7 +168,6 @@ asian.mc <- function(obj, env, n, steps, all = FALSE, plot = FALSE, ...) {
         }
     }
 
-
     # Obtain the estimate of option price by taking average of C
     C.mean <- mean(C)
 
