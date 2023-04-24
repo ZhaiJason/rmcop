@@ -106,4 +106,4 @@ price.option(op, op.env, method = "binomial",
 
 ## Support
 
-This package is for the UCL STAT0035 Project topic “R Package Development”. Exclusive support had been provided by @Mine Dogucu.
+This package is for the UCL STAT0035 Project topic “R Package Development”. The development of this pacakge is supported by UCL Department of Statistical Science faculties.
