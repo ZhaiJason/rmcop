@@ -21,4 +21,7 @@ A matrix representing the Binomial lattice tree.
 \description{
 Generating Binomial Tree Matrix
 }
+\examples{
+rmcop:::Binomial.tree(S0 = 8, u = 2, d = 0.5, n = 3)
+}
 \keyword{internal}

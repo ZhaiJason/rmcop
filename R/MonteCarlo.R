@@ -2,8 +2,6 @@
 
 #' Engine for Monte Carlo Simulation on Asset Price Trajectory
 #'
-#' @param type A string specifying the type of the option of interest. Possible values are either `"call"` or `"put"`, corresponding to call option (right to buy) and pull option (right to sale), respectively.
-#' @param K A number specifying the strike price of the option.
 #' @param t A number specifying the maturity/expiry of the option in years.
 #' @param S0 A number specifying the current price of the underlying asset.
 #' @param r A number specifying the (fixed) annual interest rate.
@@ -13,11 +11,23 @@
 #' @param steps A number specifying the number of steps each asset price trajectory will contain, used only for `method = "mc"`.
 #'
 #' @importFrom stats rnorm
-#' @return A matrix recording the simulated price trajectories.
+#' @return A matrix recording the simulated price trajectories. Noticing that if dividend rate q is not zero, the resulted asset price trajectories are ex-dividend. When a stock goes ex-dividend, its price typically drops by the amount of the dividend. This is because once the stock goes ex-dividend, new buyers of the stock are no longer entitled to receive the dividend payment.
 #'
 #' @keywords internal
-mc.engine <- function(type, K, t, S0, r, q, sigma, n, steps) {
+#' @examples
+#' # Example simulating price trajectories, noticing that if dividend rate q is not zero,
+#' # the resulted asset price trajectories are ex-dividend.
+#' with_dividend <- rmcop:::mc.engine(t = 2, S0 = 20, r = 0.5, q = 0.1, sigma = 0.1,
+#' n = 100, steps = 30)
+#' no_dividend <- rmcop:::mc.engine(t = 2, S0 = 20, r = 0.5, q = 0, sigma = 0.1,
+#' n = 100, steps = 30)
+#'
+#' # Plot trajectories
+#' rmcop:::mc.plot(with_dividend)
+#' rmcop:::mc.plot(no_dividend)
+mc.engine <- function(t, S0, r, q, sigma, n, steps) {
 
+    # Calculate delta_t, length of each step in time
     dt <- t / steps
 
     # Generate n random samples from N(0,1)
@@ -79,7 +89,7 @@ vanilla.mc <- function(obj, env, n, steps, all = FALSE, plot = FALSE, ...) {
 
     # Apply MC
     if (style == "european") {
-        S <- mc.engine(type, K, t, S0, r, q, sigma, n, steps)
+        S <- mc.engine(t, S0, r, q, sigma, n, steps)
     } else if (style == "american") {
         stop("American option pricing via MC not supported")
     }
@@ -145,7 +155,7 @@ asian.mc <- function(obj, env, n, steps, all = FALSE, plot = FALSE, ...) {
 
     # Apply MC
     if (style == "european") {
-        S <- mc.engine(type, K, t, S0, r, q, sigma, n, steps)
+        S <- mc.engine(t, S0, r, q, sigma, n, steps)
     } else if (style == "american") {
         stop("American option pricing via MC not supported")
     }
@@ -222,7 +232,7 @@ barrier.mc <- function(obj, env, n, steps, all = FALSE, plot = FALSE, ...) {
 
     # Apply MC
     if (style == "european") {
-        S <- mc.engine(type, K, t, S0, r, q, sigma, n, steps)
+        S <- mc.engine(t, S0, r, q, sigma, n, steps)
     } else if (style == "american") {
         stop("American option pricing via MC not supported")
     }
@@ -300,7 +310,7 @@ binary.mc <- function(obj, env, n, steps, all = FALSE, plot = FALSE, ...) {
 
     # Apply MC
     if (style == "european") {
-        S <- mc.engine(type, K, t, S0, r, q, sigma, n, steps)
+        S <- mc.engine(t, S0, r, q, sigma, n, steps)
     } else if (style == "american") {
         stop("American option pricing via MC not supported")
     }
@@ -367,7 +377,7 @@ lookback.mc <- function(obj, env, n, steps, all = FALSE, plot = FALSE, ...) {
 
     # Apply MC
     if (style == "european") {
-        S <- mc.engine(type, K, t, S0, r, q, sigma, n, steps)
+        S <- mc.engine(t, S0, r, q, sigma, n, steps)
     } else if (style == "american") {
         stop("American option pricing via MC not supported")
     }

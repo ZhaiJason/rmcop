@@ -36,7 +36,7 @@ Create an S3 class object which characterised an option of interest. The returne
 # Create an European vanilla option with strike price 20, expiry in 1 year.
 option("european", "vanilla", "call", K = 20, t = 1)
 
-# Create European  average strike Asian option with strike price 20, expiry in 1 year.
+# Create European average strike Asian option with strike price 20, expiry in 1 year.
 option("european", "asian", "call", K = 20, t = 1, is.avg_price = FALSE)
 
 # Create European knock-out barrier option with strike price 20, barrier price 21, expiry in 1 year.

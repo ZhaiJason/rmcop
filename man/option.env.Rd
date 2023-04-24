@@ -22,14 +22,18 @@ option.env(method = "mc", S, r, q = 0, sigma, n = NULL, steps = NULL)
 \item{steps}{A number specifying the number of steps each asset price trajectory will contain, used only for \code{method = "mc"}.}
 }
 \value{
-An S3 object with \code{class} attribute evaluated to \code{"env"}.
+An S3 object with \code{class} attribute evaluated to \code{"env"}. It represents the market environment or the properties of the underlying asset for the option pricing setting.
 }
 \description{
 Create an S3 class object which characterised the market environment used when pricing the option of interest. The returned object is used together with an \code{"option"} class object as inputs of the pricing function \code{price.option}.
 }
 \examples{
-# Create an environment with current price 20, annual interest rate 2\%,
-# annual dividend yield rate 1\%, annual volatility measure 0.05, and number
-# of simulations set to 100
-option.env(S = 20, r = 0.02, q = 0.01, sigma = 0.05, n = 100)
+# Create an environment with current price 20, annual interest rate 2\%, annual
+# dividend yield rate 1\%, annual volatility measure 0.05, and number of simulations
+# set to 100, with each trajectory breaking into 100 steps.
+option.env(S = 20, r = 0.02, q = 0.01, sigma = 0.05, n = 100, steps = 100)
+
+# Alternatively, one can leave arguments `n` and `steps` unspecified or as NULL,
+# and specify the two parameters when calling the `price.option` function.
+option.env(S = 20, r = 0.02, q = 0.01, sigma = 0.05)
 }

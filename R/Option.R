@@ -30,7 +30,7 @@
 #' # Create an European vanilla option with strike price 20, expiry in 1 year.
 #' option("european", "vanilla", "call", K = 20, t = 1)
 #'
-#' # Create European  average strike Asian option with strike price 20, expiry in 1 year.
+#' # Create European average strike Asian option with strike price 20, expiry in 1 year.
 #' option("european", "asian", "call", K = 20, t = 1, is.avg_price = FALSE)
 #'
 #' # Create European knock-out barrier option with strike price 20, barrier price 21, expiry in 1 year.
@@ -43,6 +43,7 @@
 #' option("european", "lookback", "call", K = 20, t = 1, is.fixed = TRUE)
 option <- function(style, option = "vanilla", type, K, t, ...) {
 
+    # Encapsulate basic option properties
     obj <- list(
         "style" = style,
         "type" = type,
@@ -79,7 +80,7 @@ option.vanilla <- function(obj) {
 #'
 #' @keywords internal
 option.exotic <- function(obj, option, ...) {
-    obj <- get(paste0("option.exotic.", option))(obj, ...) # Direct to corresponding initialisation function
+    obj <- get(paste0("option.exotic.", option))(obj, ...) # Direct to corresponding exotic option's initialisation function
     obj
 }
 
@@ -90,7 +91,7 @@ option.exotic <- function(obj, option, ...) {
 #'
 #' @keywords internal
 option.exotic.asian <- function(obj, is.avg_price = TRUE) {
-    obj <- c(
+    obj <- c( # Add additional exotic option properties
         obj,
         "is.avg_price" = is.avg_price
     )
@@ -105,7 +106,7 @@ option.exotic.asian <- function(obj, is.avg_price = TRUE) {
 #'
 #' @keywords internal
 option.exotic.barrier <- function(obj, barrier, is.knockout = TRUE) {
-    obj <- c(
+    obj <- c( # Add additional exotic option properties
         obj,
         "barrier" = barrier,
         "is.knockout" = is.knockout
@@ -121,7 +122,7 @@ option.exotic.barrier <- function(obj, barrier, is.knockout = TRUE) {
 #'
 #' @keywords internal
 option.exotic.binary <- function(obj, payout) {
-    obj <- c(
+    obj <- c( # Add additional exotic option properties
         obj,
         "payout" = payout
     )
@@ -136,7 +137,7 @@ option.exotic.binary <- function(obj, payout) {
 #'
 #' @keywords internal
 option.exotic.lookback <- function(obj, is.fixed = TRUE) {
-    obj <- c(
+    obj <- c( # Add additional exotic option properties
         obj,
         "is.fixed" = is.fixed
     )
@@ -158,14 +159,18 @@ option.exotic.lookback <- function(obj, is.fixed = TRUE) {
 #' @param n A number speciying the number of simulations to make (for `method = "mc"`), or the number of time steps the life of the option will be broken into (for `method = "binomial"` and `method = "trinomial"`).
 #' @param steps A number specifying the number of steps each asset price trajectory will contain, used only for `method = "mc"`.
 #'
-#' @return An S3 object with `class` attribute evaluated to `"env"`.
+#' @return An S3 object with `class` attribute evaluated to `"env"`. It represents the market environment or the properties of the underlying asset for the option pricing setting.
 #' @export
 #'
 #' @examples
-#' # Create an environment with current price 20, annual interest rate 2%,
-#' # annual dividend yield rate 1%, annual volatility measure 0.05, and number
-#' # of simulations set to 100
-#' option.env(S = 20, r = 0.02, q = 0.01, sigma = 0.05, n = 100)
+#' # Create an environment with current price 20, annual interest rate 2%, annual
+#' # dividend yield rate 1%, annual volatility measure 0.05, and number of simulations
+#' # set to 100, with each trajectory breaking into 100 steps.
+#' option.env(S = 20, r = 0.02, q = 0.01, sigma = 0.05, n = 100, steps = 100)
+#'
+#' # Alternatively, one can leave arguments `n` and `steps` unspecified or as NULL,
+#' # and specify the two parameters when calling the `price.option` function.
+#' option.env(S = 20, r = 0.02, q = 0.01, sigma = 0.05)
 option.env <- function(method = "mc", S, r, q = 0, sigma, n = NULL, steps = NULL) {
     env <- list(
         "method" = method,

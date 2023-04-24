@@ -10,6 +10,8 @@
 #' @return A matrix representing the Binomial lattice tree.
 #'
 #' @keywords internal
+#' @examples
+#' rmcop:::Binomial.tree(S0 = 8, u = 2, d = 0.5, n = 3)
 Binomial.tree <- function(S0, u, d, n) {
     if (is.null(n)) stop("Number of binomial tree steps n is not defined.")
     dim <- n + 1

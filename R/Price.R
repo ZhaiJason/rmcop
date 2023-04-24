@@ -37,8 +37,8 @@
 #' # Binomial Lattice Tree
 #' price.option(op, op.env, n = 10, u = 1.2, d = 0.8, method = "binomial", all = FALSE)
 price.option <- function(obj, env, method = env$method, n = env$n, ... , all = FALSE) {
-    check.method(method)
-    res <- get(paste0("price.option.", method))(obj = obj, env = env, n = n, ..., all = all)
+    check.method(method) # Checking if the method specified is supported, function is under Tools.R
+    res <- get(paste0("price.option.", method))(obj = obj, env = env, n = n, ..., all = all) # Distribute to corresponding pricing methods
     res
 }
 
@@ -52,12 +52,13 @@ price.option <- function(obj, env, method = env$method, n = env$n, ... , all = F
 #'
 #' @keywords internal
 price.option.mc <- function(obj, env, n, steps = env$steps, all, ...) {
+    # Checking if parameters n and steps are specified
     if (is.null(n)) stop("n is not specified")
     if (is.null(steps)) {
         steps <- 1
         warning("steps is not specified, evaluated to default value 1")
     }
-    res <- get(paste0(class(obj)[1], ".mc"))(obj = obj, env = env, n = n, steps = steps, all = all, ...)
+    res <- get(paste0(class(obj)[1], ".mc"))(obj = obj, env = env, n = n, steps = steps, all = all, ...) # Trigger pricing engine
     res
 }
 
@@ -70,12 +71,12 @@ price.option.mc <- function(obj, env, n, steps = env$steps, all, ...) {
 #'
 #' @keywords internal
 price.option.bs <- function(obj, env, n, all) {
-    if (obj$style == "american") {
+    if (obj$style == "american") { # American option pricing using bs is limited, check if the condition is satisfied
         if (env$q != 0 | obj$type != "call") {
             warning("Black Scholes valuation should only apply on European european options or American call option with non-dividend paying asset, the result here will be based on European options pricing and may not be accurate.")
         }
     }
-    res <- get(paste0(class(obj)[1], ".bs"))(obj, env, all)
+    res <- get(paste0(class(obj)[1], ".bs"))(obj, env, all) # Trigger pricing engine
     res
 }
 
@@ -90,6 +91,7 @@ price.option.bs <- function(obj, env, n, all) {
 #'
 #' @keywords internal
 price.option.binomial <- function(obj, env, n, u, d, all) {
-    res <- get(paste0(class(obj)[1], ".binomial"))(obj = obj, env = env, n = n, u = u, d = d, all = all)
+    if (is.null(n)) stop("n is not specified") # Check if number of binomial tree steps is specified
+    res <- get(paste0(class(obj)[1], ".binomial"))(obj = obj, env = env, n = n, u = u, d = d, all = all) # Trigger pricing engine
     res
 }

@@ -4,13 +4,9 @@
 \alias{mc.engine}
 \title{Engine for Monte Carlo Simulation on Asset Price Trajectory}
 \usage{
-mc.engine(type, K, t, S0, r, q, sigma, n, steps)
+mc.engine(t, S0, r, q, sigma, n, steps)
 }
 \arguments{
-\item{type}{A string specifying the type of the option of interest. Possible values are either \code{"call"} or \code{"put"}, corresponding to call option (right to buy) and pull option (right to sale), respectively.}
-
-\item{K}{A number specifying the strike price of the option.}
-
 \item{t}{A number specifying the maturity/expiry of the option in years.}
 
 \item{S0}{A number specifying the current price of the underlying asset.}
@@ -26,9 +22,21 @@ mc.engine(type, K, t, S0, r, q, sigma, n, steps)
 \item{steps}{A number specifying the number of steps each asset price trajectory will contain, used only for \code{method = "mc"}.}
 }
 \value{
-A matrix recording the simulated price trajectories.
+A matrix recording the simulated price trajectories. Noticing that if dividend rate q is not zero, the resulted asset price trajectories are ex-dividend. When a stock goes ex-dividend, its price typically drops by the amount of the dividend. This is because once the stock goes ex-dividend, new buyers of the stock are no longer entitled to receive the dividend payment.
 }
 \description{
 Engine for Monte Carlo Simulation on Asset Price Trajectory
+}
+\examples{
+# Example simulating price trajectories, noticing that if dividend rate q is not zero,
+# the resulted asset price trajectories are ex-dividend.
+with_dividend <- rmcop:::mc.engine(t = 2, S0 = 20, r = 0.5, q = 0.1, sigma = 0.1,
+n = 100, steps = 30)
+no_dividend <- rmcop:::mc.engine(t = 2, S0 = 20, r = 0.5, q = 0, sigma = 0.1,
+n = 100, steps = 30)
+
+# Plot trajectories
+rmcop:::mc.plot(with_dividend)
+rmcop:::mc.plot(no_dividend)
 }
 \keyword{internal}
