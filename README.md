@@ -22,7 +22,11 @@ The development version can be installed using the following code. You will also
 remotes::install_github("ZhaiJason/rmcop")
 ```
 
-Alternatively, it can be installed using package `devtools`
+Alternatively, it can be installed using package `devtools` using the line:
+
+```r
+devtools::install_github("ZhaiJason/rmcop")
+```
 
 ---
 
@@ -102,4 +106,4 @@ price.option(op, op.env, method = "binomial",
 
 ## Support
 
-This package is for the UCL STAT0035 Project topic “R Package Development”. Exclusive support had been provided by @Mine Dogucu.
+This package is for the UCL STAT0035 Project topic “R Package Development”. The development of this pacakge is supported by UCL Department of Statistical Science faculties.
