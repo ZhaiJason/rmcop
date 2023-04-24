@@ -22,7 +22,11 @@ The development version can be installed using the following code. You will also
 remotes::install_github("ZhaiJason/rmcop")
 ```
 
-Alternatively, it can be installed using package `devtools`
+Alternatively, it can be installed using package `devtools` using the line:
+
+```r
+devtools::install_github("ZhaiJason/rmcop")
+```
 
 ---
 
